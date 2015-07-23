@@ -1,0 +1,7 @@
+-R src ""
+-R bin ""
+-R /Users/jebe/git/coq-ext-lib/theories ExtLib
+KOPITIAM_0 = "SourceLoadPath src"
+KOPITIAM_1 = "DefaultOutput bin"
+KOPITIAM_2 = "AbstractLoadPath dk.itu.sdg.kopitiam/lp/coq/8.4"
+KOPITIAM_3 = "ExternalLoadPath /Users/jebe/git/coq-ext-lib/theories ExtLib"
