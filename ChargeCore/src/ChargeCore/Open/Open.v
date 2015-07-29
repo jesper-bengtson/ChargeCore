@@ -87,10 +87,6 @@ Section Expr.
 
 End Expr.
 
-Notation "'`' x" := (liftn x) (at level 9).
-Notation "'`(' x ')'" := (liftn x) (only parsing).
-Notation "x '/V'" := (var_expr x) (at level 9, format "x /V").
-
 Section SimultAdd.
   Context {A val} {HR : RelDec (@eq A)} {V: ValNull val}.
 

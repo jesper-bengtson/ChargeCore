@@ -36,11 +36,11 @@ Section Subst.
   Definition substlist := list (A * @expr A val).
 
   (* The identity substitution *)
-  Definition subst0 : subst := fun x => x/V.
+  Definition subst0 : subst := fun x => var_expr x.
 
   (* Substitution of one variable *)
   Definition subst1 e x : subst :=
-    fun x' => if x' ?[ eq ] x then e else x'/V.
+    fun x' => if x' ?[ eq ] x then e else var_expr x'.
 
   (* Truncating substitution of one variable *)
   Definition subst1_trunc e x : subst :=
@@ -100,7 +100,7 @@ Section Properties.
   Proof.
     apply functional_extensionality; intro x'; simpl.
     unfold stack_subst, subst1, stack_add.
-    consider (x' ?[ eq ] x); reflexivity. 
+    consider (x' ?[ eq ] x); reflexivity.
   Qed.
 
   Lemma substl_subst1 x e :
@@ -117,7 +117,7 @@ Section Properties.
 
   Local Open Scope open_scope.
   Lemma subst1_stack_add {B} (p : open B) (e : expr) (x : A) (v : val) (s : @stack A val) : 
-    p[{e//x}] (stack_add x v s) = p[{e[{`v//x}]//x}] s.
+    p[{e//x}] (stack_add x v s) = p[{e[{V_expr v//x}]//x}] s.
   Proof.
     unfold apply_subst, subst1; simpl.
     apply f_equal.
@@ -133,19 +133,19 @@ Section Properties.
       rewrite stack_lookup_add2; [reflexivity | intuition].
   Qed.
       
-  Lemma stack_add_var (x : A) (s : @stack A val) (v : val) : (x/V) (stack_add x v s) = v.
+  Lemma stack_add_var (x : A) (s : @stack A val) (v : val) : (var_expr x) (stack_add x v s) = v.
   Proof.
     unfold var_expr. rewrite stack_lookup_add. reflexivity.
   Qed.
   
   Lemma subst1_val (v : val) (e : open val) (x : A) :
-    `v[{e//x}] = `v.
+    (V_expr v)[{e//x}] = (V_expr v).
   Proof.
     reflexivity.
   Qed.
 
   Lemma subst_identity {B} (x : A) (s : @stack A val) (p : open B) :
-    p[{`(s x)//x}] s = p s.
+    p[{(V_expr (s x))//x}] s = p s.
   Proof.
     unfold subst1, apply_subst.
     apply f_equal.
@@ -167,7 +167,7 @@ Section Properties.
   Qed.
 
   Lemma subst1_trunc_singleton_stack {B} (p : open B) (s : @stack A val) x y :
-    p[{y/V //! x}] s = p (stack_add x (s y) (stack_empty A val)).
+    p[{(var_expr y) //! x}] s = p (stack_add x (s y) (stack_empty A val)).
   Proof.
     unfold apply_subst, subst1_trunc, stack_subst; simpl.
     apply f_equal.
@@ -205,7 +205,7 @@ Section MoreLemmas.
   Qed.
 
   Lemma subst_var_cons_eq : 
-    forall (x:A) es (e : expr (val := val)), ((x/V) // ((x, e)::es)) = e.
+    forall (x:A) es (e : expr (val := val)), (var_expr x // ((x, e)::es)) = e.
   Proof.
     intros x es e.
     apply functional_extensionality; intros s; simpl.
@@ -215,7 +215,7 @@ Section MoreLemmas.
 
   Lemma subst_var_cons_ineq : forall (x:A) y es (e : expr (val := val))
     (Hneq: x <> y),
-    ((x/V) // ((y, e)::es)) = ((x/V) // es).
+    (var_expr x // ((y, e)::es)) = (var_expr x // es).
   Proof.
     intros x y es e Hneq.
     apply functional_extensionality; intros s.

@@ -67,7 +67,7 @@ Section UUSAProd.
 	Qed.
 	
 End UUSAProd.
-
+(*
 Section SASum.
   Context A B `{HA: SepAlg A} `{HB: SepAlg B}.
 
@@ -107,7 +107,7 @@ Section SASum.
       now try rewrite <- Heq.
   Qed.
 End SASum.
-
+*)
 Require Import List Morphisms.
 
 Module SAFin.
