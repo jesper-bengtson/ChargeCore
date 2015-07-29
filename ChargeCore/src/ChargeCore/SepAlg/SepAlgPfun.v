@@ -24,19 +24,21 @@ Section PartialFun.
   Definition pfun := X -> partial Y.
 
   Definition pfun_eq (f1 f2 : pfun) := forall s, f1 s = f2 s.
-  Global Instance pfunEquiv : Rel pfun | 0 := {rel := pfun_eq}.
+  Global Instance pfunEquiv : Rel pfun | 0 :=
+  { rel := pfun_eq }.
+
   Global Instance EquivalencePfun : Equivalence rel.
-  Proof. 
+  Proof.
     split; intuition congruence.
   Qed.
 
   Definition emptyFun : pfun := fun _ => Undefined.
-  
+
   Definition pfun_update (f : pfun) (x : X) (y : Y) :=
     fun z => if dec_eq x z then Defined y else f z.
 
   Lemma update_shadow (f : pfun) (x : X) (y1 y2 : Y) :
-    pfun_update (pfun_update f x y1) x y2 === pfun_update f x y2.
+    rel (pfun_update (pfun_update f x y1) x y2) (pfun_update f x y2).
   Proof.
       unfold pfun_update; intro z; destruct (dec_eq x z); reflexivity.
   Qed.
@@ -44,7 +46,7 @@ Section PartialFun.
   Lemma update_lookup (f : pfun) (x : X) (y : Y) :
     (pfun_update f x y) x = Defined y.
   Proof.
-    unfold pfun_update. 
+    unfold pfun_update.
     destruct (dec_eq x x); [reflexivity| congruence].
   Qed.
 
@@ -56,7 +58,7 @@ Section PartialFun.
   Qed.
 
   Lemma update_commute (f : X -> partial Y) (x1 x2 : X) (y1 y2 : Y) (H : x1 <> x2) :
-    pfun_update (pfun_update f x1 y1) x2 y2 === pfun_update (pfun_update f x2 y2) x1 y1.
+    rel (pfun_update (pfun_update f x1 y1) x2 y2) (pfun_update (pfun_update f x2 y2) x1 y1).
   Proof.
     unfold pfun_update; intro z.
     destruct (dec_eq x2 z); destruct (dec_eq x1 z); try reflexivity.
@@ -72,7 +74,7 @@ Section PartialFun.
       | H : _ /\ _ |- _ => let H1 := fresh "H" in destruct H as [H H1]; SepOpSolve
       | H : ?f ?x = _ |- context [match ?f ?x with | Defined _ => _ | Undefined => _ end] =>
         rewrite H; SepOpSolve
-      | H : forall x : X, _ |- _ => 
+      | H : forall x : X, _ |- _ =>
                    match goal with
                        | x : X |- _ => specialize (H x)
                    end; SepOpSolve
@@ -83,10 +85,10 @@ Section PartialFun.
      definitions for sa_unit and sa_mul *)
 
   Global Instance PFunSepAlgOps : SepAlgOps (X -> partial Y) := {
-     sa_unit f := f === emptyFun;
+     sa_unit f := rel f emptyFun;
      sa_mul    := fun a b c => forall x,
                     match c x with
-                      | Defined y => (a x = Defined y /\ b x = Undefined) \/ 
+                      | Defined y => (a x = Defined y /\ b x = Undefined) \/
                                      (b x = Defined y /\ a x = Undefined)
                       | Undefined => a x = Undefined /\ b x = Undefined
                     end
@@ -98,32 +100,32 @@ Section PartialFun.
 
   Global Instance PFunSepAlg : SepAlg (X -> partial Y).
   Proof.
-  	esplit; simpl.
-	+ intros * H x. SepOpSolve.
-	+ intros * H1 H2.
-      exists (fun x => 
-                  match b x with
-                    | Defined y => Defined y
-                    | Undefined => c x
-                  end).
+    esplit; simpl.
+    + eapply Equivalence.pointwise_equivalence; eauto with typeclass_instances.
+    + intros * H x. SepOpSolve.
+    + intros * H1 H2.
+      exists (fun x =>
+                match b x with
+                | Defined y => Defined y
+             | Undefined => c x
+              end).
       split; intro x; SepOpSolve.
     + intros; exists emptyFun. split; [reflexivity | intros x].
       remember (a x) as p; destruct p; simpl; intuition.
     + intros * H H1. unfold equiv, rel, pfunEquiv, pfun_eq, emptyFun in H; simpl in H.
-      intros k. SepOpSolve. 
-	+ intros a b Hab; split; intros H1 x; unfold emptyFun in *; specialize (H1 x); simpl in H1;
-	  SepOpSolve.
-	+ intros * Hab H1 x; SepOpSolve.
+      intros k. SepOpSolve.
+    + intros a b Hab; split; intros H1 x; unfold emptyFun in *; specialize (H1 x); simpl in H1;
+      SepOpSolve.
+    + intros * Hab H1 x; SepOpSolve.
  Qed.
 
   Definition UUMapSepAlg : @UUSepAlg (X -> partial Y) _ _.
   Proof.
-  	split.
-  	+ apply _.
-  	+ intros m u Hu x. simpl in Hu. remember (m x) as e. destruct e.
-  	  * split; [intuition|]. specialize (Hu x). intuition.
-  	  * left; split; [intuition|]. specialize (Hu x); intuition.
-  Qed.  
+    split.
+    + apply _.
+    + intros m u Hu x. simpl in Hu. remember (m x) as e. destruct e.
+      * split; [intuition|]. specialize (Hu x). intuition.
+      * left; split; [intuition|]. specialize (Hu x); intuition.
+  Qed.
 
 End PartialFun.
-

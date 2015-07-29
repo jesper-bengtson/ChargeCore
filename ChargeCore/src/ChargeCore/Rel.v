@@ -1,8 +1,6 @@
 Require Import Setoid Morphisms  RelationClasses.
 Require Import Coq.Strings.String.
 
-Print LoadPath.
-
 Class DecidableEq (A : Type) := { dec_eq (a b : A) : {a = b} + {a <> b} }.
 
 Instance DecNat : DecidableEq nat. Proof. split. decide equality. Qed.
@@ -58,5 +56,3 @@ Section EquivProducts.
   Qed.
 
 End EquivProducts.
-
-

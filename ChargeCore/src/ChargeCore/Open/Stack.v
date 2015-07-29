@@ -1,5 +1,5 @@
-Require Import Rel.
-Require Import FunctionalExtensionality.
+Require Import ChargeCore.Rel.
+Require Import Coq.Logic.FunctionalExtensionality.
 
 Require Import ExtLib.Core.RelDec.
 Require Import ExtLib.Tactics.Consider.
