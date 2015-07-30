@@ -37,7 +37,7 @@ Instance inhabitedBool: Inhabited bool. Proof. split; split; apply true. Qed.
 
 (* Logical connectives *)
 Class ILogicOps (A : Type) : Type := {
-  lentails: relation A;
+  lentails: A -> A -> Prop;
   ltrue: A;
   lfalse: A;
   limpl: A -> A -> A;
