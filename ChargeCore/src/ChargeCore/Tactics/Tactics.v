@@ -1,7 +1,7 @@
 Require Export ChargeCore.Logics.ILogic.
 Require ChargeCore.Tactics.Lemmas.
 
-Ltac charge_split := apply landR.
+Ltac charge_split := simple eapply landR.
 
 Ltac charge_search_prems found :=
   match goal with
@@ -27,6 +27,10 @@ Ltac charge_intros :=
            charge_intro
          end.
 
+Ltac charge_revert :=
+  first [ simple eapply Lemmas.landAdj_true
+        | simple eapply landAdj ].
+
 Ltac charge_trivial := apply ltrueR.
 
 Ltac charge_use :=
@@ -38,14 +42,23 @@ Ltac charge_use :=
 
 Ltac ends_with H ABC C :=
   let rec go k ABC :=
-      match ABC with
-      | C => k
-      | _ -->> ?BC =>
-        let k' := (k; first [ apply Lemmas.landAdj_true in H | apply landAdj in H ]) in
+      idtac "go " ABC ;
+   (match ABC with
+    | _ -->> ?BC =>
+        let k' x :=
+         (k x;
+          lazymatch type of H with
+          | ltrue |-- _ -->> _ =>
+            simple apply Lemmas.landAdj_true in H
+          | ?C |-- ?P -->> ?Q =>
+            eapply (@landAdj _ _ _ P Q C) in H
+          end)
+        in
         go k' BC
-      end
+    | _ => k tt
+    end)
   in
-  go ltac:(idtac) ABC.
+  go ltac:(fun _ => idtac) ABC.
 
 Ltac charge_apply H :=
   match type of H with
@@ -55,6 +68,35 @@ Ltac charge_apply H :=
       ends_with H X Y ; etransitivity ; [ | eapply H ]
     end
   end.
+
+Ltac inst_hyp H k :=
+  match type of H with
+  | _ |-- _ => k H
+  | forall x : ?T, _ =>
+    let xv := fresh "xv" in
+    evar (xv : T) ;
+    let q := eval cbv delta [ xv ] in xv in
+    clear xv ;
+    inst_hyp (H q) k
+  end.
+
+Ltac charge_eapply H :=
+  let k x :=
+      generalize x ;
+      let XX := fresh "XX" in
+      intro XX ;
+      match type of XX with
+      | ?Y |-- ?X =>
+        try (is_evar Y ;
+             let z := constr:(@eq_refl _ Y : Y = ltrue) in
+             idtac) ;
+        match goal with
+        | |- _ |-- ?Y =>
+          ends_with XX X Y ; etransitivity ; [ | eapply XX ] ; clear XX
+        end
+      end
+  in
+  inst_hyp H k.
 
 Ltac charge_simple_split :=
   match goal with
