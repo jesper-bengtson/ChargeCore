@@ -1,4 +1,4 @@
-Require Import SepAlg Rel OrderedType.
+Require Import SepAlg OrderedType.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -8,7 +8,7 @@ Section UUSepAlg.
   Context {A : Type} `{SA : SepAlg A}.
 
   Class UUSepAlg :=
-  { uusa          :> SepAlg A
+  { uusa          :> SepAlg (rel := rel) A
   ; uusa_unit a u : sa_unit u -> sa_mul a u a
   }.
 
@@ -26,4 +26,4 @@ Section SepAlgUniqueUnit.
 
 End SepAlgUniqueUnit.
 
-Implicit Arguments UUSepAlg [[equiv0] [SAOps]].
+Implicit Arguments UUSepAlg [[rel] [SAOps]].

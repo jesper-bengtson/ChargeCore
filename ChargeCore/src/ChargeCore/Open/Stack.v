@@ -1,4 +1,3 @@
-Require Import ChargeCore.Rel.
 Require Import Coq.Logic.FunctionalExtensionality.
 
 Require Import ExtLib.Core.RelDec.
@@ -9,7 +8,7 @@ Unset Strict Implicit.
 Set Maximal Implicit Insertion.
 
 Class ValNull (val : Type) := {
-  null   :  val
+  null : val
 }.
 
 Section Defs.

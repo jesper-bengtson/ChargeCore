@@ -1,6 +1,6 @@
 Require Import Setoid Morphisms RelationClasses Program.Basics. 
 Require Import ILogic IBILogic BILogic BILInsts ILInsts Pure ILEmbed.
-Require Import Rel SepAlg.
+Require Import SepAlg.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -9,7 +9,7 @@ Set Maximal Implicit Insertion.
 Section PureBIInsts.
   Context {A} `{sa : SepAlg A}.
   Context {B} `{IL: ILogic B}.
-  Context {HPre : PreOrder (@rel A _)}.
+  Context {HPre : PreOrder rel}.
 
   Existing Instance SABIOps.
   Existing Instance SABILogic.
@@ -99,7 +99,7 @@ End PureBIInsts.
 Section PureIBIInsts.
   Context {A} `{sa : SepAlg A}.
   Context {B} `{IL: ILogic B}.
-  Context {HPre : PreOrder (@rel A _)}.
+  Context {HPre : PreOrder rel}.
 
   Existing Instance SAIBIOps.
   Existing Instance SAIBILogic.
@@ -245,19 +245,21 @@ Section PureEmbedPre.
   Existing Instance EmbedILPreOp.
   Existing Instance EmbedILPre.
 
+  Transparent EmbedILPreDropOp.
+  Transparent EmbedILPreOp.
+Print pure.
   Instance pure_embed_pre_drop (p : B) (H : pure (@embed B A _ p)) : 
-    pure (@embed B (ILPreFrm ord A) _ p).
+    pure (PureOp := PureBILPreOp ord) (@embed B (ILPreFrm ord A) _ p).
   Proof.
-    intros t; simpl; apply H.
+    intros t. apply H.
   Qed.
   
   Instance pure_embed_pre (p : ILPreFrm ord B) (H : forall t, pure (@embed B A _ (ILPreFrm_pred p t))) : 
-    pure (@embed (ILPreFrm ord B) (ILPreFrm ord A) _ p).
+    pure (PureOp := PureBILPreOp ord) (@embed (ILPreFrm ord B) (ILPreFrm ord A) _ p).
   Proof.
-    intros t; simpl; apply H.
+    intro t; apply H.
   Qed.
  
-  
 End PureEmbedPre.
 
   

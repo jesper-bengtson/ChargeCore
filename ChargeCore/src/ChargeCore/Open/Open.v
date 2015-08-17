@@ -1,4 +1,4 @@
-Require Import Stack Rel.
+Require Import Stack.
 Require Import List OrderedType FunctionalExtensionality.
 
 Require Import ExtLib.Core.RelDec.
@@ -20,8 +20,8 @@ Section Expr.
 
   Definition expr := open val.
 
-  Global Instance OpenEquiv {X} : Rel (open X) := { rel e1 e2 := forall s, e1 s = e2 s }.
-  Instance OpenEquivalence {X} : Equivalence (@rel (open X) _).
+  Definition rel_open {X} : relation (open X) := fun e1 e2 => forall s, e1 s = e2 s.
+  Instance OpenEquivalence {X} : Equivalence (@rel_open X).
   Proof.
     split; intuition congruence.
   Qed.

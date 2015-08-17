@@ -1,5 +1,5 @@
 Require Import Setoid Morphisms RelationClasses Program.Basics Omega.
-Require Import Rel OrderedType.
+Require Import OrderedType.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -11,7 +11,7 @@ Section SepAlgSect.
     sa_mul : T -> T -> T -> Prop
   }.
 
-  Class SepAlg T `{equiv : Rel T} `{SAOps: SepAlgOps T} : Type := {
+  Class SepAlg T `{rel : T -> T -> Prop} `{SAOps: SepAlgOps T} : Type := {
     sa_type            :> Equivalence rel;
     sa_mulC a b c      : sa_mul a b c -> sa_mul b a c;
     sa_mulA a b c      : forall ab abc, sa_mul a b ab -> sa_mul ab c abc ->
@@ -24,7 +24,7 @@ Section SepAlgSect.
 
 End SepAlgSect.
 
-Implicit Arguments SepAlg [[equiv] [SAOps]].
+Implicit Arguments SepAlg [[rel] [SAOps]].
 
 Section SepAlgCompat.
   Context A `{SA: SepAlg A}.
@@ -163,5 +163,5 @@ Section Properties.
 End Properties.
 
 Implicit Arguments subheap [[A] [SAOps]].
-Implicit Arguments subheapT [[A] [equiv0] [SAOps] [b]].
-Implicit Arguments compat_subheap [[A] [equiv0] [sa] [r] [t] [SAOps]].
+Implicit Arguments subheapT [[A] [rel] [SAOps] [b]].
+Implicit Arguments compat_subheap [[A] [rel] [sa] [r] [t] [SAOps]].

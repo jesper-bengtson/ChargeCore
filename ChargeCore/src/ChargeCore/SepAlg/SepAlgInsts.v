@@ -1,8 +1,35 @@
-Require Import UUSepAlg SepAlg Rel.
+Require Import ChargeCore.SepAlg.UUSepAlg.
+Require Import ChargeCore.SepAlg.SepAlg.
+
+Require Import Relation_Definitions CRelationClasses Morphisms.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
 Set Maximal Implicit Insertion.
+
+Section RelProducts.
+  Context {A B : Type} {relA : relation A} {relB : relation B}.
+  Context {HA: Equivalence relA}.
+  Context {HB: Equivalence relB}.
+
+  Definition rel_prod : relation (A * B) :=
+    fun p1 p2 => (relA (fst p1) (fst p2) /\ relB (snd p1) (snd p2)).
+
+  Global Instance prod_proper : Proper (relA ==> relB ==> rel_prod) (@pair A B).
+  Proof.
+    intros a a' Ha b b' Hb; split; assumption.
+  Qed.
+
+  Global Instance equiv_prod : Equivalence rel_prod.
+  Proof.
+    split.
+      intros [a b]; split; reflexivity.
+      intros [a1 b1] [a2 b2] [Ha Hb]; split; symmetry; assumption.
+    intros [a1 b1] [a2 b2] [a3 b3] [Ha12 Hb12] [Ha23 Hb23];
+      split; etransitivity; eassumption.
+  Qed.
+
+End RelProducts.
 
 Section SAProd.
   Context A B `{HA: SepAlg A} `{HB: SepAlg B}.
@@ -14,7 +41,7 @@ Section SAProd.
       sa_mul (snd a) (snd b) (snd c)
   }.
 
-  Definition SepAlg_prod: SepAlg (A * B).
+  Definition SepAlg_prod: SepAlg (rel := rel_prod (relA := rel) (relB := rel0)) (A * B).
   Proof.
     esplit.
     - eapply equiv_prod.
@@ -61,7 +88,7 @@ Section UUSAProd.
   Local Existing Instance SepAlgOps_prod.
   Local Existing Instance SepAlg_prod.
 
-  Instance UUSepAlg_prod : UUSepAlg (A * B).
+  Instance UUSepAlg_prod : UUSepAlg (rel := rel_prod (relA := rel) (relB := rel0)) (A * B).
   Proof.
     split.
     + apply _.
@@ -125,10 +152,10 @@ Section SAFin.
   ; ff_fin: exists l, forall t, ~ In t l -> sa_unit (ff_fun t)
   }.
 
-  Global Instance Equiv_finfun: Rel finfun :=
+  Definition rel_finfun : relation finfun :=
     fun f f' => forall t, rel (f t) (f' t).
 
-  Global Instance Equivalence_finfun: Equivalence rel.
+  Global Instance Equivalence_finfun: Equivalence rel_finfun.
   Proof.
     split.
     - intros f t. reflexivity.
@@ -152,11 +179,10 @@ Section SAFin.
   Hypothesis indefinite_description : forall (P : A->Prop),
    ex P -> sig P.
 
-  Global Instance SepAlg_fin: SepAlg finfun.
+  Global Instance SepAlg_fin: SepAlg (rel := rel_finfun) finfun.
   Proof.
     admit.
     (*
-    esplit.
     - intros a b c H t. specialize (H t). now apply sa_mulC in H.
     - intros a b c ab abc Hab Habc.
       set (f := (fun t => proj1_sig (indefinite_description (

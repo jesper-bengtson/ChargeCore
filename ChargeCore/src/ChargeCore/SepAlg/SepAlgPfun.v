@@ -1,12 +1,14 @@
-Require Import Setoid Morphisms Rel.
+Require Import Setoid Morphisms.
 Require Import SepAlg UUSepAlg String List.
 Require Import Program.Basics Program.Tactics Program.Syntax.
 Require Import OrderedType.
 
+Require Import ExtLib.Core.RelDec.
+
 Set Implicit Arguments.
 Unset Strict Implicit.
 Set Maximal Implicit Insertion.
-
+(*
 Inductive partial (A : Type) :=
 | Undefined : partial A
 | Defined : A -> partial A.
@@ -19,15 +21,13 @@ Section PartialFun.
   (* A partial function is a function from X -> option Y where X equality of members
      of type X is decidable. *)
 
-  Context {X Y : Type} {HDec: DecidableEq X}.
+  Context {X Y : Type} {RelDec_X : RelDec (@eq X)}.
 
   Definition pfun := X -> partial Y.
 
   Definition pfun_eq (f1 f2 : pfun) := forall s, f1 s = f2 s.
-  Global Instance pfunEquiv : Rel pfun | 0 :=
-  { rel := pfun_eq }.
 
-  Global Instance EquivalencePfun : Equivalence rel.
+  Global Instance EquivalencePfun : Equivalence pfun_eq.
   Proof.
     split; intuition congruence.
   Qed.
@@ -35,10 +35,10 @@ Section PartialFun.
   Definition emptyFun : pfun := fun _ => Undefined.
 
   Definition pfun_update (f : pfun) (x : X) (y : Y) :=
-    fun z => if dec_eq x z then Defined y else f z.
+    fun z => if x ?[ eq ] z then Defined y else f z.
 
   Lemma update_shadow (f : pfun) (x : X) (y1 y2 : Y) :
-    rel (pfun_update (pfun_update f x y1) x y2) (pfun_update f x y2).
+    pfun_eq (pfun_update (pfun_update f x y1) x y2) (pfun_update f x y2).
   Proof.
       unfold pfun_update; intro z; destruct (dec_eq x z); reflexivity.
   Qed.
@@ -129,3 +129,4 @@ Section PartialFun.
   Qed.
 
 End PartialFun.
+*)

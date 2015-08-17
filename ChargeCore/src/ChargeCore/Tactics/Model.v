@@ -3,8 +3,6 @@ Require Import ChargeCore.Logics.ILInsts.
 Require Import ChargeCore.Logics.BILInsts.
 Require Import ChargeCore.Logics.Later.
 
-Require Import ChargeCore.Rel.
-
 Require Import Setoid.
 Require Import Omega.
 
@@ -16,7 +14,7 @@ Local Existing Instance ILPre_Ops.
 Local Existing Instance ILPre_ILogic.
 Local Existing Instance ILFun_Ops.
 Local Existing Instance ILFun_ILogic.
-Local Existing Instance EquivPreorder.
+(*Local Existing Instance EquivPreorder.*)
 
 Local Transparent ILPre_Ops.
 Local Transparent ILFun_Ops.
