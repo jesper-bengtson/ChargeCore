@@ -20,7 +20,7 @@ Section Expr.
 
   Definition expr := open val.
 
-  Definition rel_open {X} : relation (open X) := fun e1 e2 => forall s, e1 s = e2 s.
+  Definition rel_open {X} :  open X -> open X -> Prop := fun e1 e2 => forall s, e1 s = e2 s.
   Instance OpenEquivalence {X} : Equivalence (@rel_open X).
   Proof.
     split; intuition congruence.

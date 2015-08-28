@@ -18,6 +18,8 @@ Section Defs.
   Definition stack := A -> val.
 
   Definition stack_empty : stack := fun x => null.
+  
+  Definition stack_get (x : A) : stack -> val  := fun s => s x. 
 
   Definition stack_add x v s : stack :=
     fun x' => if x' ?[ eq ] x then v else s x'.
