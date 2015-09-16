@@ -1,5 +1,4 @@
-Require Import Rel.
-Require Import FunctionalExtensionality.
+Require Import Coq.Logic.FunctionalExtensionality.
 
 Require Import ExtLib.Core.RelDec.
 Require Import ExtLib.Tactics.Consider.
@@ -9,7 +8,7 @@ Unset Strict Implicit.
 Set Maximal Implicit Insertion.
 
 Class ValNull (val : Type) := {
-  null   :  val
+  null : val
 }.
 
 Section Defs.
@@ -19,6 +18,8 @@ Section Defs.
   Definition stack := A -> val.
 
   Definition stack_empty : stack := fun x => null.
+  
+  Definition stack_get (x : A) : stack -> val  := fun s => s x. 
 
   Definition stack_add x v s : stack :=
     fun x' => if x' ?[ eq ] x then v else s x'.

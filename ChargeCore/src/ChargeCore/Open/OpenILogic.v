@@ -1,4 +1,3 @@
-Require Import ChargeCore.Rel.
 Require Import ChargeCore.Logics.ILogic. 
 Require Import ChargeCore.Logics.ILEmbed.
 Require Import ChargeCore.Logics.ILInsts.
@@ -9,7 +8,7 @@ Local Existing Instance ILFun_Ops.
 Local Existing Instance ILFun_ILogic.
 
 Section VLogic.
-  Context {A val : Type} {Heq : DecidableEq A}.
+  Context {A val : Type}.
   Context {V : ValNull val}.
 
   Definition vlogic := @open A val Prop.
@@ -31,7 +30,7 @@ Section VLogic.
 End VLogic.
 
 Section Existentialise.
-  Context {A val : Type} {Heq : DecidableEq A}.
+  Context {A val : Type}.
   Context {V : ValNull val}.
   Context {B : Type} `{ILB : ILogic B} {EmbOp : EmbedOp Prop B} {Emb : Embed Prop B}.
   

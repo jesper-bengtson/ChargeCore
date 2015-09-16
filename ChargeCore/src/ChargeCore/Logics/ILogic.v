@@ -99,7 +99,7 @@ Class ILogic {A : Type} {ILOps: ILogicOps A} : Type := {
   landAdj: forall (P Q C : A), C |-- (P -->> Q) -> C //\\ P |-- Q;
   limplAdj: forall (P Q C : A), C //\\ P |-- Q -> C |-- (P -->> Q)
 }.
-Check lforallL.
+
 Implicit Arguments ILogic [[ILOps]].
 Implicit Arguments lforallL [[ILOps] [ILogic] [A] [T] [P] [C]].
 Implicit Arguments lexistsR [[ILOps] [ILogic] [A] [T] [P] [C]].

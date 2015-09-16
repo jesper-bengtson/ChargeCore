@@ -1,4 +1,3 @@
-Require Import ChargeCore.Rel.
 Require Import ChargeCore.Open.Stack.
 Require Import ChargeCore.Open.Open.
 

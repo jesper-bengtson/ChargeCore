@@ -1,6 +1,6 @@
-Require Import Setoid Morphisms RelationClasses Program.Basics. 
+Require Import Setoid Morphisms RelationClasses Program.Basics.
 Require Import ILogic IBILogic BILogic BILInsts ILInsts Pure ILEmbed.
-Require Import Rel SepAlg.
+Require Import SepAlg.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -9,7 +9,7 @@ Set Maximal Implicit Insertion.
 Section PureBIInsts.
   Context {A} `{sa : SepAlg A}.
   Context {B} `{IL: ILogic B}.
-  Context {HPre : PreOrder (@rel A _)}.
+  Context {HPre : PreOrder rel}.
 
   Existing Instance SABIOps.
   Existing Instance SABILogic.
@@ -17,7 +17,7 @@ Section PureBIInsts.
   Existing Instance pure_bi_sepalg.
   Existing Instance ILPre_Ops.
   Existing Instance ILPre_ILogic.
-  
+
   Transparent ILPre_Ops.
   Transparent SABIOps.
 
@@ -87,10 +87,10 @@ Section PureBIInsts.
     intros h h'; simpl; reflexivity.
   Qed.
 
-  Instance pure_bi_embed (p : ILPreFrm rel C) (H : pure p) : 
+  Instance pure_bi_embed (p : ILPreFrm rel C) (H : pure p) :
     pure (@embed (ILPreFrm rel C) (ILPreFrm rel B) _ p).
   Proof.
-    intros h h'; simpl. 
+    intros h h'; simpl.
     specialize (H h h'). rewrite H. reflexivity.
   Qed.
 
@@ -99,7 +99,7 @@ End PureBIInsts.
 Section PureIBIInsts.
   Context {A} `{sa : SepAlg A}.
   Context {B} `{IL: ILogic B}.
-  Context {HPre : PreOrder (@rel A _)}.
+  Context {HPre : PreOrder rel}.
 
   Existing Instance SAIBIOps.
   Existing Instance SAIBILogic.
@@ -107,7 +107,7 @@ Section PureIBIInsts.
   Existing Instance pure_ibi_sepalg.
   Existing Instance ILPre_Ops.
   Existing Instance ILPre_ILogic.
-  
+
   Transparent ILPre_Ops.
   Transparent SAIBIOps.
 
@@ -183,10 +183,10 @@ Section PureIBIInsts.
     intros h h'; simpl; reflexivity.
   Qed.
 
-  Instance pure_ibi_embed (p : ILPreFrm subheap C) (H : pure p) : 
+  Instance pure_ibi_embed (p : ILPreFrm subheap C) (H : pure p) :
     pure (@embed (ILPreFrm subheap C) (ILPreFrm subheap B) _ p).
   Proof.
-    intros h h'; simpl. 
+    intros h h'; simpl.
     specialize (H h h'). rewrite H. reflexivity.
   Qed.
 
@@ -213,18 +213,18 @@ Section PureEmbedFun.
   Transparent EmbedILFunDropOp.
   Transparent EmbedILFunOp.
 
-  Instance pure_embed_fun_drop (p : B) (H : pure (@embed B A _ p)) : 
+  Instance pure_embed_fun_drop (p : B) (H : pure (@embed B A _ p)) :
     pure (@embed B (T -> A) _ p).
   Proof.
     intros t; simpl; apply H.
   Qed.
-  
-  Instance pure_embed_fun (p : T -> B) (H : forall t, pure (@embed B A _ (p t))) : 
+
+  Instance pure_embed_fun (p : T -> B) (H : forall t, pure (@embed B A _ (p t))) :
     pure (@embed (T -> B) (T -> A) _ p).
   Proof.
     intros t; simpl; apply H.
   Qed.
-    
+
 End PureEmbedFun.
 
 Section PureEmbedPre.
@@ -245,22 +245,19 @@ Section PureEmbedPre.
   Existing Instance EmbedILPreOp.
   Existing Instance EmbedILPre.
 
-  Instance pure_embed_pre_drop (p : B) (H : pure (@embed B A _ p)) : 
-    pure (@embed B (ILPreFrm ord A) _ p).
+  Transparent EmbedILPreDropOp.
+  Transparent EmbedILPreOp.
+
+  Instance pure_embed_pre_drop (p : B) (H : pure (@embed B A _ p)) :
+    pure (PureOp := PureBILPreOp ord) (@embed B (ILPreFrm ord A) _ p).
   Proof.
-    intros t; simpl; apply H.
+    intros t. apply H.
   Qed.
-  
-  Instance pure_embed_pre (p : ILPreFrm ord B) (H : forall t, pure (@embed B A _ (ILPreFrm_pred p t))) : 
-    pure (@embed (ILPreFrm ord B) (ILPreFrm ord A) _ p).
+
+  Instance pure_embed_pre (p : ILPreFrm ord B) (H : forall t, pure (@embed B A _ (ILPreFrm_pred p t))) :
+    pure (PureOp := PureBILPreOp ord) (@embed (ILPreFrm ord B) (ILPreFrm ord A) _ p).
   Proof.
-    intros t; simpl; apply H.
+    intro t; apply H.
   Qed.
- 
-  
+
 End PureEmbedPre.
-
-  
-
-  
-

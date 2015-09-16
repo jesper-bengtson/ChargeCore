@@ -1,5 +1,5 @@
 Require Import Setoid Morphisms RelationClasses Program.Basics Omega.
-Require Import Rel OrderedType.
+Require Import OrderedType.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -11,20 +11,20 @@ Section SepAlgSect.
     sa_mul : T -> T -> T -> Prop
   }.
 
-  Class SepAlg T `{e : Rel T} `{SAOps: SepAlgOps T} : Type := {
+  Class SepAlg T `{rel : T -> T -> Prop} `{SAOps: SepAlgOps T} : Type := {
     sa_type            :> Equivalence rel;
     sa_mulC a b c      : sa_mul a b c -> sa_mul b a c;
     sa_mulA a b c      : forall ab abc, sa_mul a b ab -> sa_mul ab c abc ->
                                         exists bc, sa_mul b c bc /\ sa_mul a bc abc;
     sa_unit_ex a       : exists e, sa_unit e /\ sa_mul a e a;
-    sa_unit_eq a a' e  : sa_unit e -> sa_mul a e a' -> a' === a;
-    sa_unit_proper     : Proper (equiv ==> iff) sa_unit;
-    sa_mul_mon a b c d : a === b -> sa_mul a c d -> sa_mul b c d 
+    sa_unit_eq a a' e  : sa_unit e -> sa_mul a e a' -> rel a' a;
+    sa_unit_proper     : Proper (rel ==> iff) sa_unit;
+    sa_mul_mon a b c d : rel a b -> sa_mul a c d -> sa_mul b c d 
   }.
 
 End SepAlgSect.
- 
-Implicit Arguments SepAlg [[e] [SAOps]].
+
+Implicit Arguments SepAlg [[rel] [SAOps]].
 
 Section SepAlgCompat.
   Context A `{SA: SepAlg A}.
@@ -32,7 +32,7 @@ Section SepAlgCompat.
   Definition compat (a b : A) := exists s, sa_mul a b s.
   Definition subheap (a b : A) := exists c, sa_mul a c b.
 
-  Lemma sa_mul_monR (a b c d : A) (Habc : sa_mul a b c) (Hcd: c === d) : sa_mul a b d.
+  Lemma sa_mul_monR (a b c d : A) (Habc : sa_mul a b c) (Hcd: rel c d) : sa_mul a b d.
   Proof.
   	pose proof (sa_unit_ex d) as [u [H1 H2]].
   	apply symmetry in Hcd.
@@ -43,7 +43,7 @@ Section SepAlgCompat.
   	apply (sa_unit_eq H1) in H3.
   	apply sa_mulC. eapply sa_mul_mon; [| eapply sa_mulC]; eassumption.
   Qed.
-  
+
   Lemma sa_mulC2 a b c : sa_mul a b c <-> sa_mul b a c.
   Proof.
     split; apply sa_mulC.
@@ -101,7 +101,7 @@ Lemma join_sub_units_eq A `{SepAlg A} (a b ea eb a': A):
   sa_mul a a' b ->
   sa_mul a ea a -> sa_unit ea ->
   sa_mul b eb b -> sa_unit eb ->
-  ea === eb.
+  rel ea eb.
 Proof.
   intros Hab Hmulea Hunitea Hmuleb Huniteb.
   apply sa_mulC in Hmulea.
@@ -118,7 +118,7 @@ Section Properties.
   Open Scope sa_scope.
    
   Global Instance sa_subheap_equiv_proper :
-    Proper (equiv ==> equiv ==> iff) (subheap (A := A)).
+    Proper (rel ==> rel ==> iff) (subheap (A := A)).
   Proof.
     intros x y Heqxy t u Heqtu; split; intros [c H]; exists c;
     [rewrite <- Heqxy; rewrite <- Heqtu | rewrite  Heqxy; rewrite Heqtu]; assumption.
@@ -134,7 +134,7 @@ Section Properties.
   Qed.
 	  
   Global Instance sa_compat_equiv_proper :
-    Proper (equiv ==> equiv ==> iff) (compat (A := A)).
+    Proper (rel ==> rel ==> iff) (compat (A := A)).
   Proof.
     intros x y Heqxy t u Heqtu; split; [intros [s Heqxst] | intros [s Heqysu]]; exists s.
     + rewrite <- Heqxy, <- Heqtu; assumption.
@@ -163,6 +163,5 @@ Section Properties.
 End Properties.
 
 Implicit Arguments subheap [[A] [SAOps]].
-Implicit Arguments subheapT [[A] [e] [SAOps] [b]].
-Implicit Arguments compat_subheap [[A] [e] [sa] [r] [t] [SAOps]].
-
+Implicit Arguments subheapT [[A] [rel] [SAOps] [b]].
+Implicit Arguments compat_subheap [[A] [rel] [sa] [r] [t] [SAOps]].

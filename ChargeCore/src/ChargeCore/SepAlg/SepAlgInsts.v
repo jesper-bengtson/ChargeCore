@@ -1,22 +1,50 @@
-Require Import UUSepAlg SepAlg Rel.
+Require Import ChargeCore.SepAlg.UUSepAlg.
+Require Import ChargeCore.SepAlg.SepAlg.
+
+Require Import Relation_Definitions CRelationClasses Morphisms.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
 Set Maximal Implicit Insertion.
 
+Section RelProducts.
+  Context {A B : Type} {relA : relation A} {relB : relation B}.
+  Context {HA: Equivalence relA}.
+  Context {HB: Equivalence relB}.
+
+  Definition rel_prod : relation (A * B) :=
+    fun p1 p2 => (relA (fst p1) (fst p2) /\ relB (snd p1) (snd p2)).
+
+  Global Instance prod_proper : Proper (relA ==> relB ==> rel_prod) (@pair A B).
+  Proof.
+    intros a a' Ha b b' Hb; split; assumption.
+  Qed.
+
+  Global Instance equiv_prod : Equivalence rel_prod.
+  Proof.
+    split.
+      intros [a b]; split; reflexivity.
+      intros [a1 b1] [a2 b2] [Ha Hb]; split; symmetry; assumption.
+    intros [a1 b1] [a2 b2] [a3 b3] [Ha12 Hb12] [Ha23 Hb23];
+      split; etransitivity; eassumption.
+  Qed.
+
+End RelProducts.
+
 Section SAProd.
   Context A B `{HA: SepAlg A} `{HB: SepAlg B}.
 
-  Instance SepAlgOps_prod: SepAlgOps (A * B) := {|
-    sa_unit ab := sa_unit (fst ab) /\ sa_unit (snd ab);
-    sa_mul a b c :=
+  Instance SepAlgOps_prod: SepAlgOps (A * B) :=
+  { sa_unit ab := sa_unit (fst ab) /\ sa_unit (snd ab)
+  ; sa_mul a b c :=
       sa_mul (fst a) (fst b) (fst c) /\
       sa_mul (snd a) (snd b) (snd c)
-   |}.
+  }.
 
-  Definition SepAlg_prod: SepAlg (A * B).
+  Definition SepAlg_prod: SepAlg (rel := rel_prod (relA := rel) (relB := rel0)) (A * B).
   Proof.
     esplit.
+    - eapply equiv_prod.
     - intros * [Hab Hab']. split; apply sa_mulC; assumption.
     - intros * [Habc Habc'] [Hbc Hbc'].
       destruct (sa_mulA Habc Hbc) as [exA []].
@@ -33,39 +61,41 @@ Section SAProd.
       unfold Equivalence.equiv in Heq; destruct Heq; simpl in *.
       rewrite <- H, <- H0; intuition.
   Qed.
-  
-  Lemma subheap_prod (a a' : A) (b b' : B) : subheap (a, b) (a', b') <-> subheap a a' /\ subheap b b'.
+
+  Lemma subheap_prod (a a' : A) (b b' : B)
+  : subheap (a, b) (a', b') <-> subheap a a' /\ subheap b b'.
   Proof.
-  	split; [intros [c [H1 H2]]| intros [[c H1] [d H2]]]; simpl in *.
-  	+ destruct c as [c d]; simpl in *; split.
-  	  * exists c. apply H1.
-  	  * exists d. apply H2.
-  	+ exists (c, d); simpl; split.
-  	  * apply H1.
-  	  * apply H2.
+    split; [intros [c [H1 H2]]| intros [[c H1] [d H2]]]; simpl in *.
+    + destruct c as [c d]; simpl in *; split.
+      * exists c. apply H1.
+      * exists d. apply H2.
+    + exists (c, d); simpl; split.
+      * apply H1.
+      * apply H2.
   Qed.
 
-  Lemma sa_mul_split (a b c : A) (a' b' c' : B) : sa_mul (a, a') (b, b') (c, c') <-> sa_mul a b c /\ sa_mul a' b' c'.
+  Lemma sa_mul_split (a b c : A) (a' b' c' : B)
+  : sa_mul (a, a') (b, b') (c, c') <-> sa_mul a b c /\ sa_mul a' b' c'.
   Proof.
     split; intros; simpl in *; auto.
   Qed.
-  
+
 End SAProd.
 
 Section UUSAProd.
-	Context A B `{HA : UUSepAlg A} `{HB: UUSepAlg B}.
-	
-	Local Existing Instance SepAlgOps_prod.
-	Local Existing Instance SepAlg_prod.
-	
-	Instance UUSepAlg_prod : UUSepAlg (A * B).
-	Proof.
-		split.
-		+ apply _.
-		+ intros. destruct H as [H1 H2]. destruct u; simpl in *.
-		  split; apply uusa_unit; assumption.
-	Qed.
-	
+  Context A B `{HA : UUSepAlg A} `{HB: UUSepAlg B}.
+
+  Local Existing Instance SepAlgOps_prod.
+  Local Existing Instance SepAlg_prod.
+
+  Instance UUSepAlg_prod : UUSepAlg (rel := rel_prod (relA := rel) (relB := rel0)) (A * B).
+  Proof.
+    split.
+    + apply _.
+    + intros. destruct H as [H1 H2]. destruct u; simpl in *.
+      split; apply uusa_unit; assumption.
+  Qed.
+
 End UUSAProd.
 (*
 Section SASum.
@@ -108,7 +138,8 @@ Section SASum.
   Qed.
 End SASum.
 *)
-Require Import List Morphisms.
+Require Import Coq.Lists.List.
+Require Import Coq.Classes.Morphisms.
 
 Module SAFin.
 Section SAFin.
@@ -116,15 +147,15 @@ Section SAFin.
   Context A `{HA: SepAlg A}.
 
   (* A function where only a finite number of elements map to non-unit. *)
-  Record finfun := {
-    ff_fun :> T -> A;
-    ff_fin: exists l, forall t, ~ In t l -> sa_unit (ff_fun t)
+  Record finfun :=
+  { ff_fun :> T -> A
+  ; ff_fin: exists l, forall t, ~ In t l -> sa_unit (ff_fun t)
   }.
 
-  Global Instance Equiv_finfun: Rel finfun :=
+  Definition rel_finfun : relation finfun :=
     fun f f' => forall t, rel (f t) (f' t).
 
-  Global Instance Equivalence_finfun: Equivalence rel.
+  Global Instance Equivalence_finfun: Equivalence rel_finfun.
   Proof.
     split.
     - intros f t. reflexivity.
@@ -148,11 +179,10 @@ Section SAFin.
   Hypothesis indefinite_description : forall (P : A->Prop),
    ex P -> sig P.
 
-  Global Instance SepAlg_fin: SepAlg finfun.
+  Global Instance SepAlg_fin: SepAlg (rel := rel_finfun) finfun.
   Proof.
     admit.
     (*
-    esplit.
     - intros a b c H t. specialize (H t). now apply sa_mulC in H.
     - intros a b c ab abc Hab Habc.
       set (f := (fun t => proj1_sig (indefinite_description (
@@ -181,7 +211,7 @@ Section SAFin.
     - intros f f' Hf. split; intros H t.
       + rewrite <-(Hf t). apply H.
       + rewrite (Hf t). apply H.
-    - intros f f' g g' Hf Hg t. 
+    - intros f f' g g' Hf Hg t.
       + rewrite <-(Hf t). apply Hg.
   Grab Existential Variables.
   * exists nil. intros t _.
