@@ -1,5 +1,4 @@
 Require Import Setoid Morphisms RelationClasses Program.Basics Omega.
-Require Import OrderedType.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -48,7 +47,6 @@ Section SepAlgCompat.
   Proof.
     split; apply sa_mulC.
   Qed.
-
 
   Global Instance sa_mul_proper : Proper (rel ==> rel ==> rel ==> iff) sa_mul.
   Proof.

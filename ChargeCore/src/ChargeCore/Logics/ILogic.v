@@ -124,7 +124,6 @@ Section ILogicEquiv2.
 
 End ILogicEquiv2.
 
-
 (* Most of the connectives in ILogicOps are redundant. They can be derived from
    lexists, lforall and limpl, and the choice of limpl is unique up to lequiv
    since it is an adjoint. *)
