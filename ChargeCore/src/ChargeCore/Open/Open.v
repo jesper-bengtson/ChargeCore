@@ -1,5 +1,6 @@
 Require Import Stack.
-Require Import List OrderedType FunctionalExtensionality.
+Require Import List FunctionalExtensionality.
+Require Import Coq.Classes.RelationClasses.
 
 Require Import ExtLib.Core.RelDec.
 

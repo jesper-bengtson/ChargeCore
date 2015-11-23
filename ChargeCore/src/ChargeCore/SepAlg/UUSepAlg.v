@@ -1,4 +1,4 @@
-Require Import SepAlg OrderedType.
+Require Import SepAlg.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
