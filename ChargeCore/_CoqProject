@@ -32,3 +32,4 @@ KOPITIAM_3 = "ExternalLoadPath /Users/jebe/git/coq-ext-lib/theories ExtLib"
 ./src/ChargeCore/Tactics/Model.v
 ./src/ChargeCore/Tactics/Lemmas.v
 ./src/ChargeCore/Tactics/Tactics.v
+./src/ChargeCore/Tactics/Indexed.v
