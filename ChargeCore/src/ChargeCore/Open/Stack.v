@@ -6,13 +6,15 @@ Require Import ExtLib.Tactics.Consider.
 Set Implicit Arguments.
 Unset Strict Implicit.
 Set Maximal Implicit Insertion.
+Set Universe Polymorphism.
 
 Class ValNull (val : Type) := {
   null : val
 }.
 
 Section Defs.
-  Context {A val : Type} {HA : RelDec (@eq A)} {HR : RelDec_Correct HA}.
+  Context {A val : Type}.
+  Context {HA : RelDec (@eq A)} {HR : RelDec_Correct HA}.
   Context {VNB : ValNull val}.
 
   Definition stack := A -> val.

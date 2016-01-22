@@ -14,7 +14,7 @@ Section Expr.
   Context {A val : OpenType} {HR : RelDec (@eq A)} {HROk : RelDec_Correct HR}.
   Context {V : ValNull val}.
 
-  Definition open B : Type := stack A val -> B.
+  Polymorphic Definition open B : Type := stack A val -> B.
 
   Program Definition lift {A B} (f : A -> B) (a : open A) : open B := 
     fun x => f (a x).
@@ -39,7 +39,7 @@ Section Expr.
     fun x y => f (x, y).
   Program Definition opair {B C} (b : open B) (c : open C) : open ((B * C)%type) :=
     fun x => (b x, c x).
-
+(*
   Fixpoint Tprod (Ts : list Type) : Type :=
     match Ts with
       | nil => unit
@@ -85,16 +85,17 @@ Section Expr.
 
   Program Definition liftn {T Ts R} {H: MyEq T (my_arrows Ts R)} (f : T) :=
     uncurry_open (lift (curry_fun (eq_rect T (@id Type) f _ (@term_eq _ _ _ H)))).
-
+*)
 End Expr.
 
 Section SimultAdd.
   Context {A val} {HR : RelDec (@eq A)} {V: ValNull val}.
-
+(*
   Definition simult_add_pair_list_stack lst (s s' : stack A val) :=
     fold_right (fun v:A * expr => fun s' => stack_add (fst v) (snd v s) s') s' lst.
-
+*)
 End SimultAdd.
-
+(*
   Notation " xs ':@:' s '+:+' s' " := (simult_add_pair_list_stack xs s s')
                                         (at level 69, right associativity).
+*)

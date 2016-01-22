@@ -1,22 +1,23 @@
 Require Import ChargeCore.Open.Stack.
 Require Import ChargeCore.Open.Open.
 
-Require Import List FunctionalExtensionality.
+Require Import FunctionalExtensionality.
 
 Require Import ExtLib.Core.RelDec.
 Require Import ExtLib.Tactics.Consider.
-Require Import ExtLib.Data.List.
+Require Import ExtLib.Data.PList.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
 Set Maximal Implicit Insertion.
+Set Universe Polymorphism.
 
-Fixpoint zip {A} {B} (lst1 : list A) (lst2 : list B) : list (A * B) :=
+Fixpoint zip {A} {B} (lst1 : plist A) (lst2 : plist B) : plist (A * B) :=
   match (lst1, lst2) with
-    | (nil, nil) => nil
-    | (x::xs, nil) => nil
-    | (nil, y::ys) => nil
-    | (x::xs, y::ys) => (x, y) :: zip xs ys
+    | (pnil, pnil) => pnil
+    | (pcons x xs, pnil) => pnil
+    | (pnil, pcons y ys) => pnil
+    | (pcons x xs, pcons y ys) => pcons (x, y) (zip xs ys)
   end.
 
 Section Subst.
@@ -32,7 +33,7 @@ Section Subst.
           (e : (A -> val) -> B) (sub : subst) : (A -> val) -> B :=
     fun s => e (stack_subst s sub).
 
-  Definition substlist := list (A * @expr A val).
+  Definition substlist := plist (A * @expr A val).
 
   (* The identity substitution *)
   Definition subst0 : subst := fun x => var_expr x.
@@ -48,16 +49,16 @@ Section Subst.
   (* Simultaneous substitution of a finite list of variables *)
   Fixpoint substl_aux (subs: substlist) : subst :=
     match subs with
-      | nil => subst0
-      | (x,e) :: subs' => fun x' => 
+      | pnil => subst0
+      | pcons (x,e) subs' => fun x' => 
         if x' ?[ eq ] x then e else substl_aux subs' x'
     end.
 
 (* Truncating simultaneous substitution of a finite list of variables *)
   Fixpoint substl_trunc_aux (subs: substlist) : subst :=
     match subs with
-      | nil => fun _ => empty_open
-      | (x,e) :: subs' => fun x' => 
+      | pnil => fun _ => empty_open
+      | pcons (x,e) subs' => fun x' => 
         if x' ?[ eq ] x then e else substl_trunc_aux subs' x'
     end.
 
@@ -103,13 +104,13 @@ Section Properties.
   Qed.
 
   Lemma substl_subst1 x e :
-    substl (val := val) ((x,e)::nil) = subst1 e x.
+    substl (val := val) (pcons (x,e) pnil) = subst1 e x.
   Proof. 
     reflexivity.
   Qed.
 
   Lemma substl_subst1_trunc x e :
-    substl_trunc ((x,e)::nil) = subst1_trunc e x.
+    substl_trunc (pcons (x,e) pnil) = subst1_trunc e x.
   Proof. 
     reflexivity.
   Qed.
@@ -155,7 +156,7 @@ Section Properties.
   Qed.
 
   Lemma substl_trunc_notin x' xs es :
-    ~ In x' xs ->
+    ~ pIn x' xs ->
     substl_trunc (zip xs es) x' = @empty_open _ val _.
   Proof.
     intro HnotIn. revert es. induction xs as [|x]; intros.
@@ -163,6 +164,7 @@ Section Properties.
     + destruct es as [|e]; [reflexivity|]. simpl. consider (x' ?[ eq ] x); intro.
       - subst. contradiction HnotIn. simpl. auto.
       - apply IHxs. auto with datatypes.
+        simpl in HnotIn. firstorder congruence.
   Qed.
 
   Lemma subst1_trunc_singleton_stack {B} (p : open B) (s : @stack A val) x y :
@@ -192,19 +194,19 @@ Section MoreLemmas.
   Open Scope open_scope.
 
   Lemma subst_singleton {B} : 
-    forall x e (P : @open A val B), P[{e//x}] = P // ((x, e)::nil).
+    forall x e (P : @open A val B), P[{e//x}] = P // (pcons (x, e) pnil).
   Proof.
     reflexivity.
   Qed.
 
   Lemma subst_open_expr_nil {B} :
-    forall (e : @open A val B), (e // nil) = e.
+    forall (e : @open A val B), (e // pnil) = e.
   Proof.
     reflexivity.
   Qed.
 
   Lemma subst_var_cons_eq : 
-    forall (x:A) es (e : expr (val := val)), (var_expr x // ((x, e)::es)) = e.
+    forall (x:A) es (e : expr (val := val)), (var_expr x // (pcons (x, e) es)) = e.
   Proof.
     intros x es e.
     apply functional_extensionality; intros s; simpl.
@@ -214,7 +216,7 @@ Section MoreLemmas.
 
   Lemma subst_var_cons_ineq : forall (x:A) y es (e : expr (val := val))
     (Hneq: x <> y),
-    (var_expr x // ((y, e)::es)) = (var_expr x // es).
+    (var_expr x // (pcons (y, e) es)) = (var_expr x // es).
   Proof.
     intros x y es e Hneq.
     apply functional_extensionality; intros s.
@@ -229,17 +231,17 @@ Section MoreLemmas.
   Qed.
 
   Definition subst_substlist (es fs : @substlist A val) : substlist :=
-    map (fun x => (fst x, (snd x) // fs)) es.
+    fmap_plist (fun x => (fst x, (snd x) // fs)) es.
 
   Lemma subst_combine {B} (e : @open A val B) (es fs : substlist) :
-    (e // es // fs) = (e // ((subst_substlist es fs)++fs)).
+    (e // es // fs) = (e // (app _ (subst_substlist es fs) fs)).
   Proof.
     apply functional_extensionality; intros s.
     unfold apply_subst, stack_subst; simpl.
     f_equal. apply functional_extensionality. intros x.
     induction es; simpl.
     + reflexivity.
-    + destruct a; simpl.
+    + destruct t; simpl.
       consider (x ?[ eq ] a); intros; subst; simpl.
       * reflexivity.
       * apply IHes.
@@ -254,17 +256,18 @@ Section SubstFresh.
 
   Context {A val : Type} {Heq : RelDec (@eq A)} {HeqOk : RelDec_Correct Heq}.
   Context {R : ValNull val}.
-    Definition subst_fresh (vs: A -> val) (xs: list A) : subst :=
+      
+   Definition subst_fresh (vs: A -> val) (xs: plist A) : subst :=
       fun x' => if (anyb (rel_dec x')) xs then V_expr (vs x') else var_expr x'.
 
-   Fixpoint subst_fresh_l (vs: A -> val) (xs: list A) : list (@expr A val) :=
+   Fixpoint subst_fresh_l (vs: A -> val) (xs: plist A) : plist (@expr A val) :=
       match xs with
-      | nil => nil
-      | x::xs' => V_expr (vs x) :: subst_fresh_l vs xs'
+      | pnil => pnil
+      | pcons x xs' => pcons (V_expr (vs x)) (subst_fresh_l vs xs')
       end.
 
     (* TODO: switch the two alt. definitions. *)
-    Lemma subst_fresh_alt (vs: A -> val) (xs: list A) :
+    Lemma subst_fresh_alt (vs: A -> val) (xs: plist A) :
       subst_fresh vs xs = substl (zip xs (subst_fresh_l vs xs)).
     Proof.
       induction xs as [|x]; [reflexivity|].
