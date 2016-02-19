@@ -39,11 +39,12 @@ Section Existentialise.
   
   Local Existing Instance EmbedILFunOp.
   Local Existing Instance EmbedILFun.
-
+(*
   Lemma existentialise_var (x : A) (P : open B) : 
   	P |-- @lexists (open B) _ _ (fun v : val => @lembedand vlogic (open B) _ _ (open_eq (fun s => s x) (fun _ => v)) P).
   Proof.
   	intro s; unfold liftn, lift, var_expr, open_eq; simpl. apply lexistsR with (s x). 	
   	apply landR; [apply embedPropR|]; reflexivity.
   Qed.
+*)
 End Existentialise.
