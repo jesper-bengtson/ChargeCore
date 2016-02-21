@@ -141,7 +141,6 @@ Tactic Notation "charge" "clear" constr(n) := charge_clear_n n.
 Tactic Notation "charge" "destruct" constr(n) := charge_destruct_n n.
 Tactic Notation "charge" "split" constr(n) := charge_split_n n.
 
-(* TODO(gmalecha): Fix this
 Section demo.
   Context {L : Type}
           {ILO : ILogicOps L}
@@ -156,4 +155,3 @@ Section demo.
          { charge_tauto. }
   Qed.
 End demo.
-*)

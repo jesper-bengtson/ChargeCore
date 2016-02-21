@@ -28,8 +28,8 @@ Ltac charge_intros :=
          end.
 
 Ltac charge_revert :=
-  first [ simple eapply Lemmas.landAdj_true
-        | simple eapply landAdj ].
+  first [ simple eapply landAdj
+        | simple eapply Lemmas.landAdj_true ].
 
 Ltac charge_trivial := apply ltrueR.
 
