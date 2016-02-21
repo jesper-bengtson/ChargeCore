@@ -7,3 +7,4 @@ _CoqPath
 *~
 Makefile.coq
 /bin
+.coq-native
