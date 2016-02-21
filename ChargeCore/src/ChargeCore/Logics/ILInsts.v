@@ -1,5 +1,7 @@
-Require Import RelationClasses Setoid Morphisms.
-Require Import ILogic ILEmbed.
+Require Import Coq.Classes.RelationClasses.
+Require Import Coq.Setoids.Setoid.
+Require Import Coq.Classes.Morphisms.
+From ChargeCore.Logics Require Import ILogic ILEmbed.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

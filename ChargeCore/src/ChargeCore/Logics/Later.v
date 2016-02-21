@@ -1,5 +1,5 @@
-Require Import Setoid Morphisms RelationClasses Program.Basics Omega.
-Require Import ILogic ILInsts ILEmbed.
+Require Import Setoid Morphisms RelationClasses Omega.
+From ChargeCore.Logics Require Import ILogic ILInsts ILEmbed.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -8,13 +8,13 @@ Set Maximal Implicit Insertion.
 Section LaterSect.
   Context {A : Type}.
   Context `{ILOps: ILogicOps A}.
-          
+
 Class ILLOperators (A : Type) : Type := {
   illater : A -> A
 }.
 
 Class ILLater {ILLOps: ILLOperators A} : Type := {
-  illogic :> ILogic A;                                           
+  illogic :> ILogic A;
   spec_lob P : illater P |-- P -> |-- P;
   spec_later_weaken P : P |-- illater P;
   spec_later_impl P Q : illater (P -->> Q) -|- (illater P) -->> (illater Q);
@@ -47,7 +47,7 @@ Section ILogicLaterCoreRules.
   Lemma spec_later_and P P': |>(P //\\ P') -|- |>P //\\ |>P'.
   Proof.
     do 2 rewrite land_is_forall; rewrite spec_later_forall;
-    split; apply lforallR; intro x; apply lforallL with x; 
+    split; apply lforallR; intro x; apply lforallL with x;
     destruct x; reflexivity.
   Qed.
 
@@ -56,7 +56,7 @@ Section ILogicLaterCoreRules.
     do 2 rewrite lor_is_exists; split;
     [rewrite spec_later_exists_inhabited; [|firstorder]| rewrite <- spec_later_exists];
     apply lexistsL; intro x; apply lexistsR with x; destruct x; reflexivity.
-  Qed.    
+  Qed.
 
   Lemma spec_later_true : |>ltrue -|- ltrue.
   Proof.
@@ -78,13 +78,13 @@ Section ILogic_nat.
   Context {A : Type}.
   Context `{IL: ILogic A}.
 
-  Global Program Instance ILLaterNatOps : ILLOperators (ILPreFrm ge A)  := 
+  Global Program Instance ILLaterNatOps : ILLOperators (ILPreFrm ge A)  :=
     {|
       illater P := mkILPreFrm (fun x => Forall y : nat, Forall H : y < x, (ILPreFrm_pred P) y) _
     |}.
   Next Obligation.
     intros.
-    apply lforallR; intro x; apply lforallR; intro Hx; apply lforallL with x. 
+    apply lforallR; intro x; apply lforallR; intro Hx; apply lforallL with x.
     apply lforallL; [omega | reflexivity].
   Qed.
 
@@ -94,7 +94,7 @@ Local Transparent ILPre_Ops.
   Proof.
     split.
     + apply _.
-    + intros P H x; induction x. 
+    + intros P H x; induction x.
       - rewrite <- H; simpl; apply lforallR; intro y;
         apply lforallR; intro Hy; omega.
       - rewrite <- H; simpl; apply lforallR; intro y; apply lforallR; intro Hy.
@@ -134,7 +134,7 @@ Local Transparent ILPre_Ops.
       apply lexistsL; intro a; apply lforallR; intro y; apply lforallR; intro H.
       apply lforallL with y; apply lforallL with H; apply lexistsR with a.
       reflexivity.
-    + intros T F Hin x; simpl.      
+    + intros T F Hin x; simpl.
       inversion Hin as [a]; destruct x.
       - apply lexistsR with a; apply lforallR; intro y; apply lforallR; intro H; omega.
       - apply lforallL with x. apply lforallL; [omega|].
@@ -149,7 +149,7 @@ Section IBILPre.
   Context T (ord: relation T) {ord_Pre: PreOrder ord}.
   Context {A : Type} `{HBI: ILLater A}.
   Context {IL : ILogic A}.
-  
+
   Local Existing Instance ILPre_Ops.
   Local Existing Instance ILPre_ILogic.
 
@@ -161,14 +161,14 @@ Section IBILPre.
   Next Obligation.
     rewrite H. reflexivity.
   Qed.
-  
+
   Program Definition ILLaterPre : ILLater (ILPreFrm ord A).
   Proof.
     split.
     + apply _.
     + intros P HP x. apply spec_lob. apply HP.
     + intros P x. apply spec_later_weaken.
-    + intros P Q; split; intros x; simpl; 
+    + intros P Q; split; intros x; simpl;
         setoid_rewrite <- spec_later_impl;
         do 2 setoid_rewrite spec_later_forall; reflexivity.
     + intros B F; split; intros x; simpl; apply spec_later_forall.
@@ -192,7 +192,7 @@ Section IBILogic_Fun.
   Program Instance ILLaterFunOps : ILLOperators (Fun T A) := {|
     illater P := fun t => |>(P t)
   |}.
-  
+
   Program Definition ILLaterFun : ILLater (Fun T A).
   Proof.
     split.
@@ -205,7 +205,7 @@ Section IBILogic_Fun.
     + intros B F x; simpl; apply spec_later_exists.
     + intros B F I x; simpl; apply spec_later_exists_inhabited; apply I.
   Qed.
-  
+
   Global Existing Instance ILLaterFun.
 
 End IBILogic_Fun.

@@ -1,7 +1,7 @@
 Require Export ChargeCore.Logics.ILogic.
 Require ChargeCore.Tactics.Lemmas.
 
-Ltac charge_split := apply landR.
+Ltac charge_split := simple eapply landR.
 
 Ltac charge_search_prems found :=
   match goal with
@@ -27,6 +27,10 @@ Ltac charge_intros :=
            charge_intro
          end.
 
+Ltac charge_revert :=
+  first [ simple eapply Lemmas.landAdj_true
+        | simple eapply landAdj ].
+
 Ltac charge_trivial := apply ltrueR.
 
 Ltac charge_use :=
@@ -36,38 +40,31 @@ Ltac charge_use :=
         | eapply Lemmas.lapply4; [ charge_assumption | | | | ]
         | eapply Lemmas.lapply5; [ charge_assumption | | | | | ] ].
 
-Ltac ends_with H ABC C finish :=
+Ltac ends_with H ABC C :=
   let rec go k ABC :=
    (match ABC with
     | _ -->> ?BC =>
         let k' x :=
-            lazymatch BC with
-            | _ -->> _ =>
-              k ltac:(eapply landR ; [ x | ])
-            | _ => k x
-            end
+         (k x;
+          lazymatch type of H with
+          | ltrue |-- _ -->> _ =>
+            simple apply Lemmas.landAdj_true in H
+          | ?C |-- ?P -->> ?Q =>
+            eapply (@landAdj _ _ _ P Q C) in H
+          end)
         in
-        lazymatch type of H with
-        | ltrue |-- _ -->> _ =>
-          simple apply Lemmas.landAdj_true in H
-        | ?C |-- ?P -->> ?Q =>
-          eapply (@landAdj _ _ _ P Q C) in H
-        end ;
         go k' BC
-    | _ => k ltac:idtac
+    | _ => k tt
     end)
   in
-  go finish ABC.
+  go ltac:(fun _ => idtac) ABC.
 
 Ltac charge_apply H :=
   match type of H with
   | _ |-- ?X =>
     match goal with
     | |- _ |-- ?Y =>
-      let finisher post :=
-          etransitivity ; [ | eapply H ] ; post
-      in
-      ends_with H X Y finisher
+      ends_with H X Y ; etransitivity ; [ | eapply H ]
     end
   end.
 
@@ -94,10 +91,7 @@ Ltac charge_eapply H :=
              idtac) ;
         match goal with
         | |- _ |-- ?Y =>
-          let finisher post :=
-              etransitivity ; [ clear XX | eapply XX ] ; try post
-          in
-          ends_with XX X Y finisher
+          ends_with XX X Y ; etransitivity ; [ | eapply XX ] ; clear XX
         end
       end
   in
@@ -153,12 +147,8 @@ Ltac charge_fwd :=
   repeat rewrite landA ;
   search_it ltac:(idtac).
 
-
 Ltac charge_exfalso :=
   etransitivity; [ | eapply lfalseL ].
-
-Ltac charge_revert :=
-  first [ apply landAdj | apply Lemmas.lrevert ].
 
 Ltac charge_assert H :=
   apply Lemmas.lcut with (R:=H).

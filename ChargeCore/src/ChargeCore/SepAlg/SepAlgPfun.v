@@ -1,8 +1,8 @@
-Require Import Setoid Morphisms.
-Require Import SepAlg UUSepAlg String List.
-Require Import Program.Basics Program.Tactics Program.Syntax.
+Require Import Setoid Morphisms  String List.
+From ChargeCore.SepAlg Require Import SepAlg UUSepAlg.
+(* Require Import Program.Basics Program.Tactics Program.Syntax.*)
 
-Require Import ExtLib.Core.RelDec. 
+Require Import ExtLib.Core.RelDec.
 Require Import ExtLib.Tactics.Consider.
 
 Set Implicit Arguments.
@@ -31,13 +31,13 @@ Section PartialFun.
 
   Definition pfun_update (f : pfun) (x : X) (y : Y) :=
     fun z => if x ?[ eq ] z then Some y else f z.
-    
+
   Definition pfun_in (f : pfun) (x : X) : Prop := exists y, f x = Some y.
 
   Lemma update_shadow (f : pfun) (x : X) (y1 y2 : Y) :
     pfun_eq (pfun_update (pfun_update f x y1) x y2) (pfun_update f x y2).
   Proof.
-      unfold pfun_update; intro z. 
+      unfold pfun_update; intro z.
       consider (x ?[ eq ] z); intro; reflexivity.
   Qed.
 
@@ -54,7 +54,7 @@ Section PartialFun.
   Proof.
     unfold pfun_update.
     consider (x ?[ eq ] z); intros; [|reflexivity].
-    contradiction H. 
+    contradiction H.
   Qed.
 
   Lemma update_commute (f : X -> option Y) (x1 x2 : X) (y1 y2 : Y) (H : x1 <> x2) :
@@ -124,7 +124,7 @@ Section PartialFun.
     + apply _.
     + intros m u Hu x. simpl in Hu. remember (m x) as e. destruct e.
       * left; split; [intuition|]. specialize (Hu x); intuition.
-      * split; [intuition|]. specialize (Hu x). intuition.    
+      * split; [intuition|]. specialize (Hu x). intuition.
   Qed.
 
   Lemma pfun_in_sa_mulR (a b c : X -> option Y) (x : X) (H : sa_mul a b c) (Hin : pfun_in c x) : pfun_in a x \/ pfun_in b x.

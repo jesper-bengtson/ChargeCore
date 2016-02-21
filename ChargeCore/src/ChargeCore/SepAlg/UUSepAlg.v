@@ -1,4 +1,4 @@
-Require Import SepAlg.
+Require Import ChargeCore.SepAlg.SepAlg.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
