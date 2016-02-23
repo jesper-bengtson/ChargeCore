@@ -20,7 +20,7 @@ To get the beta versions of Coq, activate the repository:
 Bugs
 ----
 
-If you find a bug, please report it on github: [[https://github.com/jesper-bengtson/ChargeCore/issues]]
+If you find a bug, please report it on github: https://github.com/jesper-bengtson/ChargeCore/issues
 
 
 
@@ -29,7 +29,7 @@ Build Instructions
 ------------------
 
 *Dependencies*
-This library depends on [[http://github.com/coq-ext-lib/coq-ext-lib][ExtLib]].
+This library depends on [ExtLib](http://github.com/coq-ext-lib/coq-ext-lib).
 If you have it installed then you don't need to do anything else. If you would
 like to have a local copy that is not installed, download the project, to
 ../coq-ext-lib and build it.
