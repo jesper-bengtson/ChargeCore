@@ -1,6 +1,6 @@
 -R src ""
--R ../coq-ext-lib/theories ExtLib
--arg -type-in-type
+-R ../../coq-ext-lib/theories ExtLib
+-R bin/ChargeCore ChargeCore
 KOPITIAM_0 = "SourceLoadPath src"
 KOPITIAM_1 = "DefaultOutput bin"
 KOPITIAM_2 = "AbstractLoadPath dk.itu.sdg.kopitiam/lp/coq/8.4"

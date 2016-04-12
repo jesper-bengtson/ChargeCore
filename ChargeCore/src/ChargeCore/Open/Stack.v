@@ -5,6 +5,8 @@ Require Import ExtLib.Tactics.Consider.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
+Set Primitive Projections.
+
 Set Maximal Implicit Insertion.
 Set Universe Polymorphism.
 

@@ -1,4 +1,5 @@
-Require Import Stack.
+Require Import ChargeCore.Open.Stack.
+
 Require Import List FunctionalExtensionality.
 Require Import Coq.Classes.RelationClasses.
 
@@ -9,35 +10,35 @@ Unset Strict Implicit.
 Set Maximal Implicit Insertion.
 
 Section Expr.
-  Definition OpenType := Type. (* To combat universe inconsistencies *)
+  Polymorphic Definition OpenType := Type. (* To combat universe inconsistencies *)
 
-  Context {A val : OpenType} {HR : RelDec (@eq A)} {HROk : RelDec_Correct HR}.
-  Context {V : ValNull val}.
+  Polymorphic Context {A val : OpenType} {HR : RelDec (@eq A)} {HROk : RelDec_Correct HR}.
+  Polymorphic Context {V : ValNull val}.
 
   Polymorphic Definition open B : Type := stack A val -> B.
 
-  Program Definition lift {A B} (f : A -> B) (a : open A) : open B := 
+  Polymorphic Program Definition lift {A B} (f : A -> B) (a : open A) : open B := 
     fun x => f (a x).
 
-  Definition expr := open val.
+  Polymorphic Definition expr := open val.
 
-  Definition rel_open {X} :  open X -> open X -> Prop := fun e1 e2 => forall s, e1 s = e2 s.
-  Instance OpenEquivalence {X} : Equivalence (@rel_open X).
+  Polymorphic Definition rel_open {X} :  open X -> open X -> Prop := fun e1 e2 => forall s, e1 s = e2 s.
+  Polymorphic Instance OpenEquivalence {X} : Equivalence (@rel_open X).
   Proof.
     split; intuition congruence.
   Qed.
   
-  Definition open_const {B : Type} (b : B) : open B := fun s => b.
+  Polymorphic Definition open_const {B : Type} (b : B) : open B := fun s => b.
   
-  Definition V_expr (v : val) : expr := fun s => v.
-  Definition var_expr (x : A) : expr := fun s => s x.
-  Definition empty_open : expr := fun x => null.
+  Polymorphic Definition V_expr (v : val) : expr := fun s => v.
+  Polymorphic Definition var_expr (x : A) : expr := fun s => s x.
+  Polymorphic Definition empty_open : expr := fun x => null.
 
-  Definition uncurry {A B C} (f : A -> B -> C) : (A * B) -> C := 
+  Polymorphic Definition uncurry {A B C} (f : A -> B -> C) : (A * B) -> C := 
     fun x => f (fst x) (snd x).
-  Definition curry {A B C} (f : A * B -> C) : A -> B -> C :=
+  Polymorphic Definition curry {A B C} (f : A * B -> C) : A -> B -> C :=
     fun x y => f (x, y).
-  Program Definition opair {B C} (b : open B) (c : open C) : open ((B * C)%type) :=
+  Polymorphic Program Definition opair {B C} (b : open B) (c : open C) : open ((B * C)%type) :=
     fun x => (b x, c x).
 (*
   Fixpoint Tprod (Ts : list Type) : Type :=

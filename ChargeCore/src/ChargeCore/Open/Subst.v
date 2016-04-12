@@ -234,7 +234,7 @@ Section MoreLemmas.
     fmap_plist (fun x => (fst x, (snd x) // fs)) es.
 
   Lemma subst_combine {B} (e : @open A val B) (es fs : substlist) :
-    (e // es // fs) = (e // (app _ (subst_substlist es fs) fs)).
+    (e // es // fs) = (e // (app (subst_substlist es fs) fs)).
   Proof.
     apply functional_extensionality; intros s.
     unfold apply_subst, stack_subst; simpl.
