@@ -1,6 +1,6 @@
 Require Import Setoid Morphisms RelationClasses Program.Basics.
-Require Import ILogic IBILogic BILogic BILInsts ILInsts Pure ILEmbed.
-Require Import SepAlg.
+From ChargeCore.Logics Require Import ILogic IBILogic BILogic BILInsts ILInsts Pure ILEmbed.
+From ChargeCore.SepAlg Require Import SepAlg.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

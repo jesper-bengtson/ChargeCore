@@ -1,3 +1,5 @@
+_CoqProject
+_CoqPath
 *.vo
 *.glob
 *.v.d
@@ -5,3 +7,4 @@
 *~
 Makefile.coq
 /bin
+.coq-native

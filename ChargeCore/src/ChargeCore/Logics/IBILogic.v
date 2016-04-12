@@ -1,6 +1,6 @@
 Require Import RelationClasses Setoid Morphisms.
-Require Import ILogic ILInsts BILInsts BILogic SepAlg.
-Require Import Pure.
+From ChargeCore.Logics Require Import ILogic ILInsts BILInsts BILogic Pure.
+From ChargeCore.SepAlg Require Import SepAlg.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -9,7 +9,7 @@ Set Maximal Implicit Insertion.
 Section IBILogicSect.
   Context {A : Type} {ILOps : ILogicOps A} {BIOps: BILOperators A}.
   Context {BIL : BILogic A}.
- 
+
   Class IBILogic := {
     ibil_bil :> BILogic A;
     emp_trueE : |-- empSP
@@ -30,7 +30,7 @@ Section IBILogicProperties.
     rewrite emp_trueE, empSPR.
     reflexivity.
   Qed.
-  
+
   Lemma ibilsepand (p q : A) : p ** q |-- p //\\ q.
   Proof.
   	apply landR; [|rewrite sepSPC]; apply sep_forget; reflexivity.
@@ -41,12 +41,12 @@ End IBILogicProperties.
 Section IBISepAlg.
   Context {A} `{sa : SepAlg A}.
   Context {B} `{IL: ILogic B}.
-  
+
   Program Instance SAIBIOps: BILOperators (ILPreFrm subheap B) := {
     empSP := mkILPreFrm (fun x => ltrue) _;
     sepSP P Q := mkILPreFrm (fun x => Exists x1, Exists x2, Exists H : sa_mul x1 x2 x,
                                                 (ILPreFrm_pred P) x1 //\\ (ILPreFrm_pred Q) x2) _;
-    wandSP P Q := mkILPreFrm (fun x => Forall x1, Forall x2, Forall H : sa_mul x x1 x2, 
+    wandSP P Q := mkILPreFrm (fun x => Forall x1, Forall x2, Forall H : sa_mul x x1 x2,
                                                  (ILPreFrm_pred P) x1 -->> (ILPreFrm_pred Q) x2) _
   }.
   Next Obligation.
@@ -72,7 +72,7 @@ Section IBISepAlg.
   Local Existing Instance ILPre_Ops.
   Local Existing Instance ILPre_ILogic.
   Local Transparent ILPre_Ops.
-  
+
   Definition SAIBILogic_aux : BILogic (ILPreFrm subheap B).
   Proof.
     split.
@@ -82,14 +82,14 @@ Section IBISepAlg.
       apply lexistsR with x2; apply lexistsR with x1.
       apply lexistsR; [apply sa_mulC; assumption | apply landC].
     + intros P Q R x; simpl.
-      apply lexistsL; intro x1; apply lexistsL; intro x2; apply lexistsL; intro Hx. 
+      apply lexistsL; intro x1; apply lexistsL; intro x2; apply lexistsL; intro Hx.
       repeat setoid_rewrite landexistsD.
       apply lexistsL; intro x3; apply lexistsL; intro x4; apply lexistsL; intro Hx1.
       apply lexistsR with x3.
       destruct (sa_mulA Hx1 Hx) as [x5 [Hx2 Hx5]].
-      apply lexistsR with x5; apply lexistsR with Hx5. 
+      apply lexistsR with x5; apply lexistsR with Hx5.
       rewrite landA; apply landR; [apply landL1; reflexivity | apply landL2].
-      apply lexistsR with x4. apply lexistsR with x2; apply lexistsR with Hx2. reflexivity. 
+      apply lexistsR with x4. apply lexistsR with x2; apply lexistsR with Hx2. reflexivity.
     + intros P Q R; split; intros H x; simpl.
       - apply lforallR; intro x1; apply lforallR; intro x2; apply lforallR; intro Hx1.
         apply limplAdj.
@@ -123,15 +123,15 @@ Section IBISepAlg.
   Qed.
 (*
   Local Existing Instance SAIBILogic.
-  
+
   Require Import ILEmbed.
   Context {EO: EmbedOp Prop B} {Emb: Embed Prop B}.
-  
-  
+
+
   Definition supported (P : ILPreFrm subheap B) : B :=
   	Forall h, Forall h', P h //\\ P h' -->> Exists h'', embed (subheap h'' h) //\\ embed (subheap h'' h') //\\ P h''.
-  
-  	
+
+
   Lemma supported_axiom (P : ILPreFrm subheap B) : supported P -|- Forall h, (Forall Q, Forall R, (P ** Q) //\\ (P ** R) -->> P ** ((Q ** ltrue) //\\ (R ** ltrue))) h.
   Proof.
     split.
@@ -168,7 +168,7 @@ Section IBISepAlg.
       Check (@sa_mul_proper _ e).
 Require Import Setoid Morphisms RelationClasses OrderedType.
       assert (x === y) as Hxy by admit.
-      apply lexistsR with x. apply lexistsR with Hsub6. 
+      apply lexistsR with x. apply lexistsR with Hsub6.
       repeat apply landR.
       * apply landL1. reflexivity.
       * apply lexistsR with h''. apply lexistsR with h''''''.
@@ -178,9 +178,9 @@ Require Import Setoid Morphisms RelationClasses OrderedType.
         apply lexistsR. apply sa_mulC. rewrite Hxy. apply Hsub7.
         apply landR; [|apply ltrueR]. apply landL2. apply landL2. apply landL1. reflexivity.
     + unfold supported. apply lforallR; intro h. apply lforallR; intro h'.
-  
+
 *)
-  Instance pureop_pure_ibi_sepalg : PureOp := { 
+  Instance pureop_pure_ibi_sepalg : PureOp := {
     pure := fun (P : ILPreFrm subheap B) => forall h h', (ILPreFrm_pred P) h |-- (ILPreFrm_pred P) h'
   }.
 
@@ -188,7 +188,7 @@ Require Import Setoid Morphisms RelationClasses OrderedType.
   Proof.
     constructor.
     { intros.
-      unfold pure in H; simpl in H; repeat split; intros; 
+      unfold pure in H; simpl in H; repeat split; intros;
       unfold pure in *; simpl in *; intros h; simpl.
       * destruct (sa_unit_ex h) as [u [H1 H2]].
         apply lexistsR with u. apply lexistsR with h.
@@ -204,7 +204,7 @@ Require Import Setoid Morphisms RelationClasses OrderedType.
         apply landL2. reflexivity.
       * rewrite landC. apply landAdj.
         apply lexistsL; intros x1; apply lexistsL; intro x2; apply lexistsL; intros Hx.
-        apply limplAdj. 
+        apply limplAdj.
         apply lexistsR with x1. apply lexistsR with x2. apply lexistsR with Hx.
         rewrite landC, landA.
         apply landR; [apply landL1; apply H | apply landL2; reflexivity].

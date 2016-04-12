@@ -22,8 +22,8 @@ Section Defs.
   Definition stack := A -> val.
 
   Definition stack_empty : stack := fun x => null.
-  
-  Definition stack_get (x : A) : stack -> val  := fun s => s x. 
+
+  Definition stack_get (x : A) : stack -> val  := fun s => s x.
 
   Definition stack_add x v s : stack :=
     fun x' => if x' ?[ eq ] x then v else s x'.
@@ -44,7 +44,7 @@ Section Defs.
     stack_add x (s x) s = s.
   Proof.
     apply functional_extensionality.
-    intro x'. unfold stack_add. 
+    intro x'. unfold stack_add.
     consider (x' ?[ eq ] x); intros; subst; reflexivity.
   Qed.
 
@@ -52,10 +52,10 @@ Section Defs.
     stack_add x v (stack_add x v' s) = stack_add x v s.
   Proof.
     apply functional_extensionality.
-    intro x'. unfold stack_add. 
+    intro x'. unfold stack_add.
     consider (x' ?[ eq ] x); intros; reflexivity.
   Qed.
-  
+
   Lemma stack_add_val_eq (s : stack) (x : A) v1 v2 (Hs : stack_add x v1 s = stack_add x v2 s) :
   	v1 = v2.
   Proof.
@@ -63,7 +63,7 @@ Section Defs.
     rewrite Hs. reflexivity.
     do 2 rewrite stack_lookup_add in H. apply H.
   Qed.
-  
+
 End Defs.
 
 Implicit Arguments stack [].

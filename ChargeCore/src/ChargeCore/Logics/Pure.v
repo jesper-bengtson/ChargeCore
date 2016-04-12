@@ -1,5 +1,6 @@
-Require Import ILogic ILInsts BILogic ILEmbed.
-Require Import Setoid Morphisms.
+From ChargeCore.Logics Require Import ILogic ILInsts BILogic ILEmbed.
+Require Import Coq.Setoids.Setoid.
+Require Import Coq.Classes.Morphisms.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
