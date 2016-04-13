@@ -1,6 +1,6 @@
 Require Import ChargeCore.Open.Stack.
 
-Require Import List FunctionalExtensionality.
+Require Import Coq.Lists.List Coq.Logic.FunctionalExtensionality.
 Require Import Coq.Classes.RelationClasses.
 
 Require Import ExtLib.Core.RelDec.

@@ -1,4 +1,4 @@
-Require Import Setoid Morphisms  String List.
+Require Import Setoid Morphisms Coq.Strings.String Coq.Lists.List.
 From ChargeCore.SepAlg Require Import SepAlg UUSepAlg.
 (* Require Import Program.Basics Program.Tactics Program.Syntax.*)
 

@@ -1,9 +1,8 @@
+Require Import Coq.Logic.FunctionalExtensionality.
 Require Import ChargeCore.Open.Stack.
 Require Import ChargeCore.Open.Open.
-
-Require Import FunctionalExtensionality.
-
 Require Import ExtLib.Core.RelDec.
+Require Import ExtLib.Data.List.
 Require Import ExtLib.Tactics.Consider.
 
 Set Implicit Arguments.
