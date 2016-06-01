@@ -30,7 +30,7 @@ Section BILogic.
 
 End BILogic.
 
-Implicit Arguments BILogic [[BILOp] [HILOp]].
+Arguments BILogic _ {BILOp HILOp} : rename.
 
 Notation "a '**' b"  := (sepSP a b)
   (at level 58, right associativity).
@@ -80,7 +80,7 @@ Section CoreInferenceRules.
   Proof.
     split; [apply sepSPA1 | apply sepSPA2].
   Qed.
-    
+
   Lemma wandSPI (P Q R : A) (HQ : P ** Q |-- R) : (P |-- Q -* R).
   Proof.
     apply wandSPAdj; assumption.
@@ -126,14 +126,14 @@ Section CoreInferenceRules.
     rewrite sepSPC; etransitivity; [|rewrite <- sepSPC; reflexivity].
     apply bilsep. apply lforallL with x; reflexivity.
   Qed.
-  
+
   Lemma bilandscDL (P Q R : A) : (P //\\ Q) ** R |-- (P ** R) //\\ (Q ** R).
   Proof.
   	apply landR.
-  	+ apply wandSepSPAdj; apply landL1; apply wandSepSPAdj; reflexivity. 
-  	+ apply wandSepSPAdj; apply landL2; apply wandSepSPAdj; reflexivity. 
+  	+ apply wandSepSPAdj; apply landL1; apply wandSepSPAdj; reflexivity.
+  	+ apply wandSepSPAdj; apply landL2; apply wandSepSPAdj; reflexivity.
   Qed.
-  
+
   Lemma bilorscDL (P Q R : A) : (P \\// Q) ** R -|- (P ** R) \\// (Q ** R).
   Proof.
   	split.
@@ -141,7 +141,7 @@ Section CoreInferenceRules.
   	  [apply lorR1 | apply lorR2]; reflexivity.
   	+ apply lorL; apply bilsep; [apply lorR1 | apply lorR2]; reflexivity.
   Qed.
-    
+
 End CoreInferenceRules.
 
 Section BILogicMorphisms.
@@ -155,14 +155,14 @@ Section BILogicMorphisms.
     rewrite -> sepSPC.
     etransitivity; [eapply bilsep; exact HQ|].
     rewrite -> sepSPC. reflexivity.
-  Qed.  
+  Qed.
 
   Global Instance sepSP_lequiv_m:
     Proper (lequiv ==> lequiv ==> lequiv) sepSP.
   Proof.
     intros P P' HP Q Q' HQ.
     split; apply sepSP_lentails_m; (apply HP || apply HQ).
-  Qed.  
+  Qed.
 
   Global Instance wandSP_lentails_m:
     Proper (lentails --> lentails ++> lentails) wandSP.
@@ -177,7 +177,7 @@ Section BILogicMorphisms.
   Proof.
     intros P P' HP Q Q' HQ.
     split; apply wandSP_lentails_m; (apply HP || apply HQ).
-  Qed.  
+  Qed.
 
 End BILogicMorphisms.
 
@@ -207,8 +207,8 @@ Section DerivedInferenceRules.
   Proof.
     rewrite <-HR, <-HP. apply sepSPAdj. reflexivity.
   Qed.
-  
-   
+
+
   Lemma siexistsE {T : Type} (P : T -> A) (Q : A) :
     (Exists x, P x) -* Q -|- Forall x, (P x -* Q).
   Proof.
@@ -216,10 +216,10 @@ Section DerivedInferenceRules.
 	+ apply lforallR; intro x. apply wandSepSPAdj; eapply wandSPL; [|reflexivity].
 	  apply lexistsR with x. reflexivity.
 	+ apply wandSepSPAdj. rewrite bilexistsscR. apply lexistsL; intro x.
-	  rewrite sepSPC, bilforallscR. apply lforallL with x. rewrite sepSPC. 
+	  rewrite sepSPC, bilforallscR. apply lforallL with x. rewrite sepSPC.
 	  apply wandSPL; reflexivity.
   Qed.
-  
+
   Lemma septrue : forall p, p |-- p ** ltrue.
   Proof.
     intros. rewrite <- empSPR at 1.

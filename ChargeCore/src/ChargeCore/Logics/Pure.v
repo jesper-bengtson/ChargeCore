@@ -155,7 +155,7 @@ Section Pure.
   Instance pure_lor x y : pure x -> pure y ->  pure (x \\// y).
 *)
 
-
 End Pure.
 
-Implicit Arguments Pure [[A] [ILOPs] [BILOps]].
+Arguments Pure {A ILOPs BILOps} HP : clear implicits, rename.
+Arguments PureOp _ : clear implicits, rename.

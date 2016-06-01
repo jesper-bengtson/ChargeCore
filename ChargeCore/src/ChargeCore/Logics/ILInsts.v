@@ -43,8 +43,8 @@ Section ILogic_Pre.
     lor      P Q := mk (fun t => (ILPreFrm_pred P) t \\// (ILPreFrm_pred Q) t) _;
     lforall  A P := mk (fun t => Forall a, (ILPreFrm_pred (P a)) t) _;
     lexists  A P := mk (fun t => Exists a, (ILPreFrm_pred (P a)) t) _
-  |}. 
-  Next Obligation. 
+  |}.
+  Next Obligation.
     apply lforallR; intro t''.
     apply lforallR; intro Ht'.
     apply lforallL with t''.
@@ -68,14 +68,14 @@ Section ILogic_Pre.
   Proof.
    split; unfold lentails; simpl; intros.
     - split; red; [reflexivity|].
-      intros P Q R HPQ HQR t. 
+      intros P Q R HPQ HQR t.
       transitivity ((ILPreFrm_pred Q) t); [apply HPQ | apply HQR].
     - apply ltrueR.
     - apply lfalseL.
-    - apply lforallL with x; apply H. 
-    - apply lforallR; intro x; apply H. 
-    - apply lexistsL; intro x; apply H. 
-    - apply lexistsR with x; apply H. 
+    - apply lforallL with x; apply H.
+    - apply lforallR; intro x; apply H.
+    - apply lexistsL; intro x; apply H.
+    - apply lexistsR with x; apply H.
     - apply landL1; eapply H; assumption.
     - apply landL2; eapply H; assumption.
     - apply lorR1; eapply H; assumption.
@@ -102,8 +102,8 @@ Section ILogic_Pre.
     Proper (lequiv ==> ord ==> lequiv) ILPreFrm_pred.
   Proof.
     intros Hord P P' HPt t t' Ht. split.
-    - rewrite ->Ht. apply HPt. 
-    - symmetry in Ht. rewrite <-Ht. apply HPt. 
+    - rewrite ->Ht. apply HPt.
+    - symmetry in Ht. rewrite <-Ht. apply HPt.
   Qed.
 
   Global Instance ILPreFrm_pred_entails_eq_m:
@@ -127,8 +127,8 @@ Section ILogic_Pre.
 
 End ILogic_Pre.
 
-Implicit Arguments ILPreFrm [[T] [ILOps]].
-Implicit Arguments mkILPreFrm [[T] [ord] [A] [ILOps]].
+Arguments ILPreFrm [T] _ _ {ILOps} : rename.
+Arguments mkILPreFrm {T} [ord] [A] {ILOps} _ _ : rename.
 
 Section Embed_ILogic_Pre.
   Context T (ord: relation T) {HPre : PreOrder ord}.
@@ -140,14 +140,14 @@ Section Embed_ILogic_Pre.
   Program Instance EmbedILPreDropOpEq : EmbedOp A (ILPreFrm ord A) := {
      embed := fun a => mkILPreFrm (fun x => a) _
   }.
-  
+
   Instance EmbedILPreDropEq : Embed A (ILPreFrm ord A).
   Proof.
     split; intros.
     + simpl; intros. assumption.
     + split; intros t; simpl; reflexivity.
     + split; intros t; simpl; reflexivity.
-    + split; intros t; simpl. 
+    + split; intros t; simpl.
       * lforallL t. apply lforallL; reflexivity.
       * lforallR x H; reflexivity.
   Qed.
@@ -155,18 +155,18 @@ Section Embed_ILogic_Pre.
    Global Program Instance EmbedILPreDropOp : EmbedOp A (ILPreFrm ord B) := {
      embed := fun a => mkILPreFrm (fun x => embed a) _
   }.
- 
+
   Global Instance EmbedILPreDrop : Embed A (ILPreFrm ord B).
   Proof.
     split; intros.
     + simpl; intros. apply embed_sound; assumption.
     + split; intros t; simpl; apply embedlforall.
     + split; intros t; simpl; apply embedlexists.
-    + split; intros t; simpl. 
+    + split; intros t; simpl.
       * apply lforallL with t. apply lforallL; [reflexivity | apply embedImpl].
       * apply lforallR; intro x; apply lforallR; intro H. apply embedImpl.
   Qed.
-        
+
   Global Program Instance EmbedILPreOp : EmbedOp (ILPreFrm ord A) (ILPreFrm ord B) := {
      embed := fun a => mkILPreFrm (fun x => embed ((ILPreFrm_pred a) x)) _
   }.
@@ -181,11 +181,11 @@ Section Embed_ILogic_Pre.
     + split; intros t; simpl; apply embedlforall.
     + split; intros t; simpl; apply embedlexists.
     + split; intros t; simpl;
-      do 2 setoid_rewrite <- embedlforall; 
-      apply lforallR; intro t'; apply lforallR; intro H; 
+      do 2 setoid_rewrite <- embedlforall;
+      apply lforallR; intro t'; apply lforallR; intro H;
       apply lforallL with t'; apply lforallL with H; apply embedImpl.
   Qed.
-        
+
 End Embed_ILogic_Pre.
 
 (** If [Frm] is a ILogic, then the function space [T -> Frm] is also an ilogic,
@@ -206,7 +206,7 @@ Section ILogic_Fun.
     lexists  A P := fun t => Exists a, P a t
   |}.
 
-  Program Definition ILFun_ILogic : @ILogic _ ILFun_Ops. 
+  Program Definition ILFun_ILogic : @ILogic _ ILFun_Ops.
   Proof.
     split; unfold lentails; simpl; intros.
     - split; red; [reflexivity|].
@@ -228,30 +228,30 @@ Section ILogic_Fun.
   Qed.
 
   Global Existing Instance ILFun_ILogic.
-  
+
 End ILogic_Fun.
 
 Section ILogic_Option.
   Context {A : Type} `{IL: ILogic A}.
 
   Definition toProp (P : option A) :=
-  	match P with
-	  | Some P => P
-	  | None => lfalse
-	end.
+    match P with
+    | Some P => P
+    | None => lfalse
+    end.
 
-  Global Program Instance ILOption_Ops : ILogicOps (option A) := {|
-    lentails P Q := toProp P |-- toProp Q;
-    ltrue        := Some ltrue;
-    lfalse       := Some lfalse;
-    limpl    P Q := Some (toProp P -->> toProp Q);
-    land     P Q := Some (toProp P //\\ toProp Q);
-    lor      P Q := Some (toProp P \\// toProp Q);
-    lforall  A P := Some (Forall a, toProp (P a));
-    lexists  A P := Some (Exists a, toProp (P a))
-  |}.
+  Global Program Instance ILOption_Ops : ILogicOps (option A) :=
+  {| lentails P Q := toProp P |-- toProp Q
+   ; ltrue        := Some ltrue
+   ; lfalse       := Some lfalse
+   ; limpl    P Q := Some (toProp P -->> toProp Q)
+   ; land     P Q := Some (toProp P //\\ toProp Q)
+   ; lor      P Q := Some (toProp P \\// toProp Q)
+   ; lforall  A P := Some (Forall a, toProp (P a))
+   ; lexists  A P := Some (Exists a, toProp (P a))
+   |}.
 
-  Program Definition ILOption_ILogic : ILogic (option A). 
+  Program Definition ILOption_ILogic : ILogic (option A).
   Proof.
     split; unfold lentails; simpl; intros.
     - split; red; [reflexivity|].
@@ -271,7 +271,7 @@ Section ILogic_Option.
     - apply landAdj; intuition.
     - apply limplAdj; intuition.
   Qed.
-  
+
 End ILogic_Option.
 
 Section Embed_ILogic_Fun.
@@ -279,9 +279,8 @@ Section Embed_ILogic_Fun.
   Context {B : Type} `{ILB: ILogic B}.
   Context {HEmbOp : EmbedOp A B} {HEmb : Embed A B}.
 
-  Program Instance EmbedILFunDropOp {T} : EmbedOp A (T -> B) := {
-     embed := fun a t => embed a
-  }.
+  Program Instance EmbedILFunDropOp {T} : EmbedOp A (T -> B) :=
+  { embed := fun a t => embed a }.
 
   Local Existing Instance ILFun_Ops.
 
@@ -293,10 +292,9 @@ Section Embed_ILogic_Fun.
     + split; intros t; simpl; apply embedlexists.
     + split; intros t; simpl; apply embedImpl.
   Qed.
-        
-  Program Instance EmbedILFunOp {T} : EmbedOp (T -> A) (T -> B) := {
-     embed := fun a x => embed (a x)
-  }.
+
+  Program Instance EmbedILFunOp {T} : EmbedOp (T -> A) (T -> B) :=
+  { embed := fun a x => embed (a x) }.
 
   Instance EmbedILFun {T} : Embed (T -> A) (T -> B).
   Proof.
@@ -306,13 +304,13 @@ Section Embed_ILogic_Fun.
     + split; intros t; simpl; apply embedlexists.
     + split; intros t; simpl; apply embedImpl.
   Qed.
-        
+
 End Embed_ILogic_Fun.
 (*
 Section ILogicFunInv.
 
 	Context {A B} `{IL : ILogic (A -> B)}.
-	
+
   Program Definition ILFun_Ops : ILogicOps (T -> A) := {|
     lentails P Q := forall t:T, P t |-- Q t;
     ltrue        := fun t => ltrue;
@@ -323,7 +321,7 @@ Section ILogicFunInv.
     lforall  A P := fun t => Forall a, P a t;
     lexists  A P := fun t => Exists a, P a t
   |}.
-	
+
 
 End ILogicFunInv.
 *)

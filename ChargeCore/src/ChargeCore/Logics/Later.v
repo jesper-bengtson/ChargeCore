@@ -24,7 +24,7 @@ Class ILLater {ILLOps: ILLOperators A} : Type := {
 }.
 End LaterSect.
 
-Implicit Arguments ILLater [[ILLOps] [ILOps]].
+Arguments ILLater _ {ILLOps ILOps} : rename, clear implicits.
 Notation "'|>' a"  := (illater a) (at level 71).
 
 Section ILogicLaterCoreRules.

@@ -1,5 +1,5 @@
 Require Import ChargeCore.Logics.ILogic.
-Require Import Setoid Morphisms RelationClasses Program.Basics Omega. 
+Require Import Setoid Morphisms RelationClasses Program.Basics Omega.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -13,15 +13,15 @@ Section ILogicEmbed.
 
   Class Embed {EmbOp: EmbedOp} : Type := {
      embed_sound p q : p |-- q -> embed p |-- embed q;
-     
+
      embedlforall T f : Forall x : T, embed (f x) -|- embed (Forall x : T, f x);
      embedlexists T f : Exists x : T, embed (f x) -|- embed (Exists x : T, f x);
      embedImpl a b : (embed a) -->> (embed b) -|- embed (a -->> b)
   }.
 End ILogicEmbed.
 
-Implicit Arguments EmbedOp [].
-Implicit Arguments Embed [[ILOpsA] [ILOpsB] [EmbOp]].
+Arguments EmbedOp _ _ : clear implicits.
+Arguments Embed _ {ILOpsA} _ {ILOpsB EmbOp} : rename, clear implicits.
 
 Section ILogicEmbedOps.
   Context {A B} `{HAB: Embed A B} {ILA: ILogic A} {ILB: ILogic B}.
@@ -41,15 +41,15 @@ Section ILEmbedId.
 	Proof.
 		split; firstorder.
 	Qed.
-	
+
 End ILEmbedId.
 
 Section ILogicEmbedCompose.
   Context {A B} `{HAB: Embed A B} {ILA: ILogic A} {ILB: ILogic B}.
   Context {C} {HC: ILogicOps C} {HE: EmbedOp B C} {HBC : Embed B C} {ILC: ILogic C}.
-	
+
   Instance embedOpCompose : EmbedOp A C := { embed := fun x => embed (embed x) }.
-  
+
   Program Instance embedCompose : Embed A C.
   Next Obligation.
   	do 2 apply embed_sound; assumption.
@@ -140,12 +140,12 @@ Section ILogicEmbedFacts.
     rewrite ltrue_is_forall; rewrite <- embedlforall; split;
     [apply ltrueR | apply lforallR; intro x; destruct x].
   Qed.
-  
+
   Lemma embedlandC (P R : B) (Q : A) : P //\\ Q /\\ R -|- Q /\\ P //\\ R.
-  Proof.  
+  Proof.
   	unfold lembedand; rewrite <- landA, (landC P), landA; reflexivity.
   Qed.
-  
+
   Lemma embedlimplC (P R : B) (Q : A) : P -->> Q ->> R -|- Q ->> P -->> R.
   Proof.
     unfold lembedimpl. do 2 rewrite limplAdj2.
@@ -156,15 +156,15 @@ Section ILogicEmbedFacts.
   Proof.
   	apply limplAdj; rewrite landA; apply landR.
   	+ apply landL1. reflexivity.
-  	+ apply landL2. apply limplL; [reflexivity | apply landL1; reflexivity]. 
-  Qed. 
+  	+ apply landL2. apply limplL; [reflexivity | apply landL1; reflexivity].
+  Qed.
 
   Lemma embed_existsL (P : A) : Exists x : |-- P, ltrue |-- embed P.
   Proof.
   	apply lexistsL; intro H.
   	rewrite <- H. rewrite embedltrue. apply ltrueR.
   Qed.
-  
+
 End ILogicEmbedFacts.
 
 Section EmbedProp.
@@ -183,19 +183,19 @@ Section EmbedProp.
   Lemma embedPropExistsL (p : Prop) (P : A) : Exists x : p, P |-- embed p.
   Proof.
     assert (Exists x : p, ltrue |-- p). {
-      intros HP. destruct HP as [HP _]. apply HP. 
+      intros HP. destruct HP as [HP _]. apply HP.
     }
     etransitivity; [|rewrite <- H]; [reflexivity|].
     rewrite <- embedlexists. apply lexistsL; intro Hp.
     apply lexistsR with Hp. rewrite embedltrue. apply ltrueR.
   Qed.
-  
+
   (* TODO rename embedPropExists to embedPropExistsR *)
   Lemma embedPropExists' (p : Prop) : Exists x : p, ltrue -|- embed p.
   Proof.
   	split; [apply embedPropExistsL | apply embedPropExists].
   Qed.
-  
+
   Lemma embedPropL (p : Prop) C (H: p -> |-- C) :
     embed p |-- C.
   Proof.
@@ -209,7 +209,7 @@ Section EmbedProp.
     assert (ltrue |-- p) by (intros _; assumption).
     rewrite <- H0, embedltrue; apply ltrueR.
   Qed.
- 
+
   Lemma lpropandL (p: Prop) Q C (H: p -> Q |-- C) :
     p /\\ Q |-- C.
   Proof.
@@ -232,20 +232,20 @@ Section EmbedProp.
 
   Lemma lpropimplL (p: Prop) (Q C: A) (Hp: p) (HQ: Q |-- C) :
     p ->> Q |-- C.
-  Proof. 
+  Proof.
     unfold lembedimpl.
-    rewrite <- embedPropR, limplTrue; assumption. 
+    rewrite <- embedPropR, limplTrue; assumption.
   Qed.
-  
+
   Lemma lpropimplR C (p: Prop) Q (H: p -> C |-- Q) :
     C |-- p ->> Q.
-  Proof. 
+  Proof.
     unfold lembedimpl.
     apply limplAdj. rewrite landC. apply lpropandL. assumption.
   Qed.
 
   (* Derivable but useful *)
-  Lemma lpropandTrue P : True /\\ P -|- P. 
+  Lemma lpropandTrue P : True /\\ P -|- P.
   Proof.
     split.
     + apply lpropandL; intros _; reflexivity.
@@ -255,13 +255,13 @@ Section EmbedProp.
       * reflexivity.
   Qed.
 
-  Lemma lpropandFalse P : False /\\ P -|- lfalse. 
-  Proof. 
+  Lemma lpropandFalse P : False /\\ P -|- lfalse.
+  Proof.
     split.
     + apply lpropandL; intros H; destruct H.
     + apply lfalseL.
   Qed.
-  
+
 
 End EmbedProp.
 
@@ -270,26 +270,26 @@ Section EmbedProp'.
   Context {A : Type} `{HILA: ILogic A} {HPropOpA: EmbedOp Prop A} {HPropA: Embed Prop A}.
   Context {B : Type} `{HILB: ILogic B} {HPropOpB: EmbedOp Prop B} {HPropB: Embed Prop B}.
   Context {HEmbOp : EmbedOp B A} {Hemb: Embed B A}.
-  
+
   Lemma lpropandAL (p : B) (q : A) (P : Prop) : P /\\ p /\\ q |-- (P /\\ p) /\\ q.
   Proof.
-  	apply lpropandL; intros HP; apply landR.
-  	+ apply landL1; apply embed_sound; apply landR.
-  	  * apply embedPropR. assumption.
-  	  * reflexivity.
-  	+ apply landL2; reflexivity.
+    apply lpropandL; intros HP; apply landR.
+    + apply landL1; apply embed_sound; apply landR.
+      * apply embedPropR. assumption.
+      * reflexivity.
+    + apply landL2; reflexivity.
   Qed.
-  
+
   Lemma lpropandAC (p : B) (q : A) (P : Prop) : p /\\ P /\\ q -|- P /\\ p /\\ q.
   Proof.
   	unfold lembedand. do 2 rewrite <- landA; rewrite (landC (embed p)); reflexivity.
   Qed.
-    
+
   Lemma lpropandAR (p : B) (q : A) (P : Prop) : (P /\\ p) /\\ q |-- P /\\ p /\\ q.
-  Proof.	
-  	apply landR. 
+  Proof.
+  	apply landR.
   	+ apply landL1.
-  	  unfold lembedand; rewrite <- embedland; apply landL1.	
+  	  unfold lembedand; rewrite <- embedland; apply landL1.
   	  rewrite embedPropExists, <- embedlexists.
   	  apply lexistsL; intro Hp.
   	  apply embedPropR; apply Hp.
@@ -297,7 +297,7 @@ Section EmbedProp'.
   	  * apply landL1; apply landL2. reflexivity.
   	  * apply landL2; reflexivity.
  Qed.
- 
+
  Lemma lpropimplAL (p : B) (q : A) (P : Prop) : (P ->> p) /\\ q |-- P ->> (p /\\ q).
  Proof.
     unfold lembedimpl, lembedand. apply limplAdj. rewrite landA.
@@ -306,21 +306,21 @@ Section EmbedProp'.
     rewrite <- (embedPropR ltrue); [apply embedltrue | apply Hp].
     apply landR; [apply landL1|apply landL2; apply landL1]; reflexivity.
  Qed.
- 
+
  Lemma lpropimplAR (p : B) (q : A) (P : Prop) : p /\\ (P ->> q) |-- P ->> (p /\\ q).
  Proof.
     unfold lembedimpl, lembedand. rewrite landC. apply limplAdj. rewrite landA.
     apply limplL. apply landL2; reflexivity.
     apply landR; [apply landL2; apply landL1|apply landL1]; reflexivity.
  Qed.
- 
- 
+
+
   Lemma embedPropR2 (p : Prop) (P : A) (H : p) : P |-- embed (embed p).
   Proof.
     assert (ltrue |-- p) by (intros _; assumption).
     rewrite <- H0. do 2 rewrite embedltrue. apply ltrueR.
   Qed.
-  
+
   Lemma embedPropL2 (p : Prop) (C : A) (H: p -> |-- C) :
     embed (embed p) |-- C.
   Proof.
@@ -342,14 +342,14 @@ Qed.
 End EmbedPropProp.
 
 Section EmbedPropInj.
-	Context {A : Type} `{ILA : ILogic A}.
-	Context {EmbOp1 : EmbedOp Prop A} {Emb1 : Embed Prop A}.
-	Context {EmbOp2 : EmbedOp Prop A} {Emb2 : Embed Prop A}.
-	
-	Lemma emb_prop_eq (P : Prop) : @embed _ _ EmbOp1 P -|- @embed _ _ EmbOp2 P.
-	Proof.
-		split; rewrite embedPropExists; apply lexistsL; intro Hp;
-		(rewrite <- (embedPropR ltrue); [apply ltrueR | apply Hp]).
-	Qed.
+  Context {A : Type} `{ILA : ILogic A}.
+  Context {EmbOp1 : EmbedOp Prop A} {Emb1 : Embed Prop A}.
+  Context {EmbOp2 : EmbedOp Prop A} {Emb2 : Embed Prop A}.
+
+  Lemma emb_prop_eq (P : Prop) : @embed _ _ EmbOp1 P -|- @embed _ _ EmbOp2 P.
+  Proof.
+    split; rewrite embedPropExists; apply lexistsL; intro Hp;
+      (rewrite <- (embedPropR ltrue); [apply ltrueR | apply Hp]).
+  Qed.
 
 End EmbedPropInj.

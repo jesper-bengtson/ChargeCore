@@ -17,7 +17,7 @@ Section IBILogicSect.
 
 End IBILogicSect.
 
-Implicit Arguments IBILogic [[ILOps] [BIOps]].
+Arguments IBILogic _ {ILOps BIOps} : rename.
 
 Section IBILogicProperties.
 
@@ -180,7 +180,7 @@ Require Import Setoid Morphisms RelationClasses OrderedType.
     + unfold supported. apply lforallR; intro h. apply lforallR; intro h'.
 
 *)
-  Instance pureop_pure_ibi_sepalg : PureOp := {
+  Instance pureop_pure_ibi_sepalg : PureOp _ := {
     pure := fun (P : ILPreFrm subheap B) => forall h h', (ILPreFrm_pred P) h |-- (ILPreFrm_pred P) h'
   }.
 
@@ -257,7 +257,8 @@ Section IBILogic_Fun.
 
   Local Transparent ILFun_Ops.
 
-  Definition IBILFunLogic : @IBILogic ((fun x y => x -> y) T A) (@ILFun_Ops T A _) (@BILFun_Ops T A _).
+  Definition IBILFunLogic
+  : @IBILogic ((fun x y => x -> y) T A) (@ILFun_Ops T A _) (@BILFun_Ops T A _).
   Proof.
     split.
     apply BILFunLogic. apply BIL.

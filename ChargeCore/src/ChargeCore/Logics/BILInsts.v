@@ -76,7 +76,7 @@ Section BISepAlg.
         apply landR; [reflexivity| apply lexistsR; [assumption | apply ltrueR]].
   Qed.
 
-  Global Instance pureop_bi_sepalg : PureOp := {
+  Global Instance pureop_bi_sepalg : PureOp _ := {
     pure := fun (P : ILPreFrm rel B) => forall h h', (ILPreFrm_pred P) h |-- (ILPreFrm_pred P) h'
   }.
 
@@ -213,7 +213,7 @@ Section BISepAlg2.
   Context {POB : @PureOp B}.
   Context {PureB : Pure POB}.
 
-  Global Instance pureop_bi_sepalg2 : PureOp := {
+  Global Instance pureop_bi_sepalg2 : PureOp _ := {
     pure := fun (P : ILPreFrm rel B) =>
         (forall h, pure ((ILPreFrm_pred P) h)) /\
     	(forall h h', (ILPreFrm_pred P) h |-- (ILPreFrm_pred P) h')
