@@ -9,6 +9,7 @@
 ./src/ChargeCore/Logics/Later.v
 ./src/ChargeCore/Logics/BILInsts.v
 ./src/ChargeCore/Logics/ILogic.v
+./src/ChargeCore/Logics/ILogicIso.v
 
 ./src/ChargeCore/SepAlg/SepAlgPfun.v
 ./src/ChargeCore/SepAlg/SepAlgInsts.v
