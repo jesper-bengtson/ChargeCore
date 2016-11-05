@@ -1,4 +1,4 @@
 SourceLoadPath src
 DefaultOutput bin
 AbstractLoadPath dk.itu.sdg.kopitiam/lp/coq/8.4
-ExternalLoadPath /Uosers/jebe/git/coq-ext-lib/theories ExtLib
+ExternalLoadPath /Users/jebe/git/coq-ext-lib/theories ExtLib
