@@ -168,34 +168,34 @@ Section ILogicEquivOps.
 End ILogicEquivOps.
 
 Section ILogicMorphisms.
-  Context {A : Type} `{IL: ILogic A}.
+  Context {A T : Type} `{IL: ILogic A}.
 
   Global Instance lequiv_lentails : subrelation lequiv lentails.
   Proof. firstorder. Qed.
   Global Instance lequiv_flip_lentails: subrelation lequiv (flip lentails).
   Proof. firstorder. Qed.
 
-  Global Instance lforall_lentails_m T:
+  Global Instance lforall_lentails_m:
     Proper (pointwise_relation T lentails ++> lentails) lforall.
   Proof.
     intros P P' HP. apply lforallR; intro x;  apply lforallL with x.
     rewrite HP; reflexivity.
   Qed.
 
-  Global Instance lforall_lequiv_m T:
+  Global Instance lforall_lequiv_m:
     Proper (pointwise_relation T lequiv ++> lequiv) lforall.
   Proof.
     intros P P' HP; split; apply lforall_lentails_m; intro x; apply HP.
   Qed.
 
-  Global Instance lexists_lentails_m T:
+  Global Instance lexists_lentails_m:
     Proper (pointwise_relation T lentails ++> lentails) lexists.
   Proof.
     intros P P' HP. apply lexistsL; intro x; apply lexistsR with x.
     rewrite HP; reflexivity.
   Qed.
 
-  Global Instance lexists_lequiv_m T:
+  Global Instance lexists_lequiv_m:
     Proper (pointwise_relation T lequiv ++> lequiv) lexists.
   Proof.
     intros P P' HP; split; apply lexists_lentails_m; intro x; apply HP.
@@ -277,7 +277,7 @@ Tactic Notation "lforwardL" hyp(H) :=
   eapply (lforwardL H); clear H; [|intros H].
 
 Section ILogicFacts.
-  Context {A : Type} `{IL: ILogic A}.
+  Context {A T : Type} `{IL: ILogic A}.
 
   (* Experiments with proof search. *)
   Ltac landR :=
@@ -296,6 +296,9 @@ Section ILogicFacts.
           end
         end
     end.
+    
+  Lemma lentails_refl P : P |-- P.
+  Proof. reflexivity. Qed.
 
   Lemma landC P Q: P //\\ Q -|- Q //\\ P.
   Proof. split; landR; landL; reflexivity. Qed.
@@ -349,7 +352,7 @@ Section ILogicFacts.
       apply limplL; [reflexivity | landL; reflexivity].
   Qed.
 
-  Lemma landexistsDL {T} (f : T -> A) (P : A) :
+  Lemma landexistsDL (f : T -> A) (P : A) :
     (Exists a, f a) //\\ P |-- Exists a, (f a //\\ P).
   Proof.
     apply landAdj; apply lexistsL; intro a;
@@ -357,7 +360,7 @@ Section ILogicFacts.
   Qed.
 
 
-  Lemma landexistsDR {T} (f : T -> A) (P : A) :
+  Lemma landexistsDR (f : T -> A) (P : A) :
      Exists a, (f a //\\ P) |-- (Exists a, f a) //\\ P.
   Proof.
     apply lexistsL; intro a; apply landR.
@@ -365,14 +368,14 @@ Section ILogicFacts.
     - apply landL2; reflexivity.
   Qed.
 
-  Lemma landexistsD {T} (f : T -> A) (P : A) :
+  Lemma landexistsD (f : T -> A) (P : A) :
     (Exists a, f a) //\\ P -|- Exists a, (f a //\\ P).
   Proof.
     split; [apply landexistsDL | apply landexistsDR].
   Qed.
 
 
-  Lemma lorexistsDL {T} (f : T -> A) (P : A) {H : Inhabited T} :
+  Lemma lorexistsDL (f : T -> A) (P : A) {H : Inhabited T} :
     (Exists a, f a) \\// P |-- Exists a, (f a \\// P).
   Proof.
   	apply lorL.
@@ -380,7 +383,7 @@ Section ILogicFacts.
 	+ destruct H as [[x]]; apply lexistsR with x; apply lorR2; reflexivity.
   Qed.
 
-  Lemma lorexistsDR {T} (f : T -> A) (P : A) :
+  Lemma lorexistsDR (f : T -> A) (P : A) :
      Exists a, (f a \\// P) |-- (Exists a, f a) \\// P.
   Proof.
   	apply lexistsL; intro x; apply lorL.
@@ -388,14 +391,14 @@ Section ILogicFacts.
   	+ apply lorR2; reflexivity.
   Qed.
 
-  Lemma lorexistsD {T} (f : T -> A) (P : A) {H : Inhabited T} :
+  Lemma lorexistsD (f : T -> A) (P : A) {H : Inhabited T} :
     (Exists a, f a) \\// P -|- Exists a, (f a \\// P).
   Proof.
     split; [apply lorexistsDL; apply H| apply lorexistsDR].
   Qed.
 
 
-  Lemma landforallDL {T} (f : T -> A) (P : A) :
+  Lemma landforallDL (f : T -> A) (P : A) :
     (Forall a, f a) //\\ P |-- Forall a, (f a //\\ P).
   Proof.
     apply lforallR; intro a; apply landR.
@@ -403,7 +406,7 @@ Section ILogicFacts.
     + apply landL2; reflexivity.
   Qed.
 
-  Lemma landforallDR {T} {H: Inhabited T} (f : T -> A) (P : A) :
+  Lemma landforallDR {H: Inhabited T} (f : T -> A) (P : A) :
     Forall a, (f a //\\ P) |-- (Forall a, f a) //\\ P.
   Proof.
     apply landR.
@@ -411,14 +414,14 @@ Section ILogicFacts.
     + destruct H as [[a]]. apply lforallL with a; apply landL2; reflexivity.
   Qed.
 
-  Lemma landforallD {T} (f : T -> A) (P : A) {H : Inhabited T} :
+  Lemma landforallD (f : T -> A) (P : A) {H : Inhabited T} :
     (Forall a, f a) //\\ P -|- Forall a, (f a //\\ P).
   Proof.
   	split; [apply landforallDL | apply landforallDR].
   Qed.
 
 
-  Lemma lorforallDL {T} (f : T -> A) (P : A) :
+  Lemma lorforallDL (f : T -> A) (P : A) :
     (Forall a, f a) \\// P |-- Forall a, (f a \\// P).
   Proof.
   	apply lforallR; intro a; apply lorL.
@@ -435,7 +438,7 @@ Section ILogicFacts.
     + apply limplAdj; apply landL1; reflexivity.
   Qed.
 
-  Lemma limplexistsE {T : Type} (P : T -> A) (Q : A) :
+  Lemma limplexistsE (P : T -> A) (Q : A) :
     (Exists x, P x) -->> Q -|- Forall x, (P x -->> Q).
   Proof.
     split.
@@ -449,7 +452,7 @@ Section ILogicFacts.
 	  * apply landL1. reflexivity.
   Qed.
 
-  Lemma limplforallER {T : Type} (P : T -> A) (Q : A) :
+  Lemma limplforallER (P : T -> A) (Q : A) :
     Exists x, (P x -->> Q) |-- (Forall x, P x) -->> Q.
   Proof.
   	apply lexistsL; intro x. apply limplAdj. apply limplL.
@@ -459,13 +462,13 @@ Section ILogicFacts.
 
   (* The following two lemmas have an explicit forall to help unification *)
 
-  Lemma lforallR2 {T : Type} (P : A) (Q : T -> A) (H : P |-- lforall Q) :
+  Lemma lforallR2 (P : A) (Q : T -> A) (H : P |-- lforall Q) :
   	forall x, P |-- Q x.
   Proof.
     intro x; rewrite H. apply lforallL with x; reflexivity.
   Qed.
 
-  Lemma lexistsL2 {T : Type} (P : T -> A) (Q : A) (H : lexists P |-- Q) :
+  Lemma lexistsL2 (P : T -> A) (Q : A) (H : lexists P |-- Q) :
   	forall x, P x |-- Q.
   Proof.
     intro x; rewrite <- H. apply lexistsR with x; reflexivity.
