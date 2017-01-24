@@ -352,26 +352,39 @@ Section ILogicFacts.
       apply limplL; [reflexivity | landL; reflexivity].
   Qed.
 
-  Lemma landexistsDL (f : T -> A) (P : A) :
-    (Exists a, f a) //\\ P |-- Exists a, (f a //\\ P).
+  Lemma landexistsDL1 (f : T -> A) (P : A) :
+    lexists f //\\ P |-- Exists a, (f a //\\ P).
   Proof.
     apply landAdj; apply lexistsL; intro a;
     apply limplAdj; apply lexistsR with a; reflexivity.
   Qed.
 
-
-  Lemma landexistsDR (f : T -> A) (P : A) :
-     Exists a, (f a //\\ P) |-- (Exists a, f a) //\\ P.
+  Lemma landexistsDL2 (f : T -> A) (P : A) :
+    P //\\ lexists f |-- Exists a, (P //\\ f a).
+  Proof.
+    rewrite landC, landexistsDL1.
+    setoid_rewrite landC at 1; reflexivity.
+  Qed.
+  
+  Lemma landexistsDR1 (f : T -> A) (P : A) :
+     Exists a, (f a //\\ P) |-- lexists f //\\ P.
   Proof.
     apply lexistsL; intro a; apply landR.
     - apply landL1; apply lexistsR with a; reflexivity.
     - apply landL2; reflexivity.
   Qed.
 
-  Lemma landexistsD (f : T -> A) (P : A) :
+  Lemma landexistsDR2 (f : T -> A) (P : A) :
+     Exists a, (P //\\ f a) |-- P //\\ lexists f.
+  Proof.
+    rewrite landC, <- landexistsDR1.
+    setoid_rewrite landC at 1; reflexivity.
+  Qed.
+  
+  Lemma landexistsD1 (f : T -> A) (P : A) :
     (Exists a, f a) //\\ P -|- Exists a, (f a //\\ P).
   Proof.
-    split; [apply landexistsDL | apply landexistsDR].
+    split; [apply landexistsDL1 | apply landexistsDR1].
   Qed.
 
 
@@ -445,7 +458,7 @@ Section ILogicFacts.
 	+ apply lforallR; intro x. apply limplAdj; apply limplL.
 	  * apply lexistsR with x; reflexivity.
 	  * apply landL1; reflexivity.
-	+ apply limplAdj. rewrite landC, landexistsDL.
+	+ apply limplAdj. rewrite landC, landexistsDL1.
 	  apply lexistsL; intro x. rewrite landC, landforallDL.
 	  apply lforallL with x. apply limplL.
 	  * reflexivity.

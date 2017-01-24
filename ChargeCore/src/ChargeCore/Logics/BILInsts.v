@@ -15,7 +15,7 @@ Section BISepAlg.
 
   Local Transparent ILPre_Ops.
 
-  Global Program Instance SABIOps: BILOperators (ILPreFrm rel B) := {
+  Global Program Instance SABIOps: BILogicOps (ILPreFrm rel B) := {
     empSP := mkILPreFrm (fun x => Exists a : (sa_unit x), ltrue) _;
     sepSP P Q :=  mkILPreFrm (fun x => Exists x1, Exists x2, Exists H : sa_mul x1 x2 x,
                                                 (ILPreFrm_pred P) x1 //\\ (ILPreFrm_pred Q) x2) _;
@@ -43,7 +43,7 @@ Section BISepAlg.
       apply lexistsR with x2; apply lexistsR with x1; apply lexistsR with H'; apply landC.
     + intros P Q R x; simpl.
       apply lexistsL; intro x1; apply lexistsL; intro x2; apply lexistsL; intro Hx.
-      repeat setoid_rewrite landexistsD.
+      repeat setoid_rewrite landexistsD1.
       apply lexistsL; intro x3. apply lexistsL; intro x4; apply lexistsL; intro Hx1.
       destruct (sa_mulA Hx1 Hx) as [x5 [Hx2 Hx5]].
       apply lexistsR with x3; apply lexistsR with x5; apply lexistsR with Hx5.
@@ -68,7 +68,7 @@ Section BISepAlg.
       rewrite H. reflexivity.
     + intros P; split; intros x; simpl.
       - apply lexistsL; intro x1; apply lexistsL; intro x2; apply lexistsL; intro Hx.
-        rewrite landC, landexistsD. apply lexistsL; intro Horg.
+        rewrite landC, landexistsD1. apply lexistsL; intro Horg.
         apply landL2.
         apply sa_unit_eq in Hx. rewrite <- Hx. reflexivity. assumption.
       - destruct (sa_unit_ex x) as [u [H1 H2]].
@@ -106,11 +106,11 @@ Section BISepAlg.
           eapply landR. apply landL1. apply landL2. reflexivity.
           apply landL2. reflexivity. }
         { rewrite landC.
-          rewrite landexistsDL.
+          rewrite landexistsDL1.
           repeat (eapply lexistsL; intros).
-          rewrite landexistsDL.
+          rewrite landexistsDL1.
           repeat (eapply lexistsL; intros).
-          rewrite landexistsDL.
+          rewrite landexistsDL1.
           repeat (eapply lexistsL; intros).
           do 3 eapply lexistsR.
           eassumption.
@@ -148,7 +148,7 @@ Section BISepAlg2.
 
   Local Transparent ILPre_Ops.
 
-  Global Program Instance SABIOps2: BILOperators (ILPreFrm rel B) := {
+  Global Program Instance SABIOps2: BILogicOps (ILPreFrm rel B) := {
     empSP := mkILPreFrm (fun x => Exists a : (sa_unit x), empSP) _;
     sepSP P Q :=  mkILPreFrm (fun x => Exists x1, Exists x2, Exists H : sa_mul x1 x2 x,
                                                 (ILPreFrm_pred P) x1 ** (ILPreFrm_pred Q) x2) _;
@@ -252,11 +252,11 @@ Section BISepAlg2.
           apply landR; [apply landL1; auto | apply landL2].
           do 3 eapply lexistsR; [eassumption|reflexivity]. }
         { rewrite landC.
-          rewrite landexistsDL.
+          rewrite landexistsDL1.
           repeat (eapply lexistsL; intros).
-          rewrite landexistsDL.
+          rewrite landexistsDL1.
           repeat (eapply lexistsL; intros).
-          rewrite landexistsDL.
+          rewrite landexistsDL1.
           repeat (eapply lexistsL; intros).
           do 3 eapply lexistsR.
           eassumption. destruct H as [H H1].
@@ -300,7 +300,7 @@ Section BILPre.
   Context {A : Type} `{HBI: BILogic A}.
   Context {HIL : ILogic A}.
 
-  Program Instance BILPre_Ops : BILOperators (ILPreFrm ord A) := {|
+  Program Instance BILPre_Ops : BILogicOps (ILPreFrm ord A) := {|
     empSP      := mkILPreFrm (fun t => empSP) _;
     sepSP  P Q := mkILPreFrm (fun t => (ILPreFrm_pred P) t ** (ILPreFrm_pred Q) t) _;
     wandSP P Q := mkILPreFrm (fun t => Forall t', Forall H : ord t t', (ILPreFrm_pred P) t' -* (ILPreFrm_pred Q) t') _
@@ -381,7 +381,7 @@ Section BILogic_Fun.
 
   Local Transparent ILFun_Ops.
 
-  Program Definition BILFun_Ops : BILOperators ((fun x y => x -> y) T A) := {|
+  Program Definition BILFun_Ops : BILogicOps ((fun x y => x -> y) T A) := {|
     empSP         := fun t => empSP;
     sepSP     P Q := fun t => P t ** Q t;
     wandSP    P Q := fun t => P t -* Q t

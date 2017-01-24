@@ -7,7 +7,7 @@ Unset Strict Implicit.
 Set Maximal Implicit Insertion.
 
 Section IBILogicSect.
-  Context {A : Type} {ILOps : ILogicOps A} {BIOps: BILOperators A}.
+  Context {A : Type} {ILOps : ILogicOps A} {BIOps: BILogicOps A}.
   Context {BIL : BILogic A}.
 
   Class IBILogic := {
@@ -42,7 +42,7 @@ Section IBISepAlg.
   Context {A} `{sa : SepAlg A}.
   Context {B} `{IL: ILogic B}.
 
-  Program Instance SAIBIOps: BILOperators (ILPreFrm subheap B) := {
+  Program Instance SAIBIOps: BILogicOps (ILPreFrm subheap B) := {
     empSP := mkILPreFrm (fun x => ltrue) _;
     sepSP P Q := mkILPreFrm (fun x => Exists x1, Exists x2, Exists H : sa_mul x1 x2 x,
                                                 (ILPreFrm_pred P) x1 //\\ (ILPreFrm_pred Q) x2) _;
@@ -83,7 +83,7 @@ Section IBISepAlg.
       apply lexistsR; [apply sa_mulC; assumption | apply landC].
     + intros P Q R x; simpl.
       apply lexistsL; intro x1; apply lexistsL; intro x2; apply lexistsL; intro Hx.
-      repeat setoid_rewrite landexistsD.
+      repeat setoid_rewrite landexistsD1.
       apply lexistsL; intro x3; apply lexistsL; intro x4; apply lexistsL; intro Hx1.
       apply lexistsR with x3.
       destruct (sa_mulA Hx1 Hx) as [x5 [Hx2 Hx5]].

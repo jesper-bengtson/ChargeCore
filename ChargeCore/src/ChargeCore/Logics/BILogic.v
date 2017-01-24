@@ -13,13 +13,13 @@ Section BILogic.
   Context {A : BILogicType}.
   Context {HILOp: ILogicOps A}.
 
-  Class BILOperators (A : BILogicType) : Type := {
+  Class BILogicOps (A : BILogicType) : Type := {
     empSP  : A;
     sepSP  : A -> A -> A;
     wandSP : A -> A -> A
   }.
 
-  Class BILogic {BILOp: BILOperators A} : Type := {
+  Class BILogic {BILOp: BILogicOps A} : Type := {
     bilil :> ILogic A;
     sepSPC1 P Q : sepSP P Q |-- sepSP Q P;
     sepSPA1 P Q R : sepSP (sepSP P Q) R |-- sepSP P (sepSP Q R);
@@ -39,7 +39,7 @@ Notation "a '-*' b"  := (wandSP a b)
 
 Section CoreInferenceRules.
 
-  Context {A} `{HBIL: BILogic A}.
+  Context {A T : Type} `{HBIL: BILogic A}.
 
   Lemma wandSPAdj P Q C (HSep: C ** P |-- Q) : C |-- P -* Q.
   Proof.
@@ -86,7 +86,7 @@ Section CoreInferenceRules.
     apply wandSPAdj; assumption.
   Qed.
 
-  Lemma wandSPE (P Q R T : A) (HQR: Q |-- T -* R) (HP : P |-- Q ** T) : P |-- R.
+  Lemma wandSPE (P Q R S : A) (HQR: Q |-- S -* R) (HP : P |-- Q ** S) : P |-- R.
   Proof.
     apply sepSPAdj in HQR.
     rewrite <- HQR, HP. reflexivity.
@@ -97,30 +97,46 @@ Section CoreInferenceRules.
     rewrite sepSPC; apply empSPR.
   Qed.
 
-  Lemma bilexistsscL {T} (P : A) (Q : T -> A):
-    Exists x : T, P ** Q x |-- P ** Exists x : T, Q x.
+  Lemma bilexistsscR1 (P : A) (f : T -> A):
+    Exists x : T, P ** f x |-- P ** lexists f.
   Proof.
   	apply lexistsL; intro x.
     rewrite sepSPC. etransitivity; [|rewrite <- sepSPC; reflexivity].
     apply bilsep. eapply lexistsR; reflexivity.
   Qed.
 
-  Lemma bilexistsscR {T} (P : A) (Q : T -> A) :
-    P ** (Exists x : T, Q x) |-- Exists x : T, P ** Q x.
+  Lemma bilexistsscR2 (P : A) (f : T -> A):
+    Exists x : T, f x ** P |-- lexists f ** P.
+  Proof.
+    rewrite sepSPC, <- bilexistsscR1.
+    setoid_rewrite sepSPC at 1.
+    reflexivity.
+  Qed.
+
+    Lemma bilexistsscL1 (P : A) (f : T -> A) :
+    P ** lexists f |-- Exists x : T, P ** f x.
   Proof.
     rewrite sepSPC; rewrite wandSepSPAdj.
     apply lexistsL; intro x; erewrite <- wandSPAdj. reflexivity.
     eapply lexistsR; rewrite sepSPC; reflexivity.
   Qed.
 
-  Lemma bilexistssc {T} (P : A) (Q : T -> A) :
-    Exists x : T, P ** Q x -|- P ** Exists x : T, Q x.
+  Lemma bilexistsscL2 (P : A) (f : T -> A) :
+    lexists f ** P |-- Exists x : T, f x ** P.
   Proof.
-    split; [apply bilexistsscL | apply bilexistsscR].
+    rewrite sepSPC, bilexistsscL1.
+    setoid_rewrite sepSPC at 1.
+    reflexivity.
   Qed.
 
-  Lemma bilforallscR {T} (P : A) (Q : T -> A) :
-    P ** (Forall x : T, Q x) |-- Forall x : T, P ** Q x.
+    Lemma bilexistssc (P : A) (Q : T -> A) :
+    Exists x : T, P ** Q x -|- P ** lexists Q.
+  Proof.
+    split; [apply bilexistsscR1 | apply bilexistsscL1].
+  Qed.
+
+  Lemma bilforallscR (P : A) (Q : T -> A) :
+    P ** lforall Q |-- Forall x : T, P ** Q x.
   Proof.
     apply lforallR; intro x.
     rewrite sepSPC; etransitivity; [|rewrite <- sepSPC; reflexivity].
@@ -210,12 +226,12 @@ Section DerivedInferenceRules.
 
 
   Lemma siexistsE {T : Type} (P : T -> A) (Q : A) :
-    (Exists x, P x) -* Q -|- Forall x, (P x -* Q).
+    lexists P -* Q -|- Forall x, (P x -* Q).
   Proof.
     split.
 	+ apply lforallR; intro x. apply wandSepSPAdj; eapply wandSPL; [|reflexivity].
 	  apply lexistsR with x. reflexivity.
-	+ apply wandSepSPAdj. rewrite bilexistsscR. apply lexistsL; intro x.
+	+ apply wandSepSPAdj. rewrite bilexistsscL1. apply lexistsL; intro x.
 	  rewrite sepSPC, bilforallscR. apply lforallL with x. rewrite sepSPC.
 	  apply wandSPL; reflexivity.
   Qed.

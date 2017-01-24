@@ -8,7 +8,7 @@ Set Maximal Implicit Insertion.
 
 Section Pure.
 
-  Context {A : Type} {ILOPs : ILogicOps A} {BILOps : BILOperators A}.
+  Context {A : Type} {ILOPs : ILogicOps A} {BILOps : BILogicOps A}.
 
   Class PureOp := {
     pure : A -> Prop
