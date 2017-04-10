@@ -26,11 +26,11 @@ Section Subst.
   Definition substlist := list (A * @expr A val).
 
   (* The identity substitution *)
-  Definition subst0 : subst := fun x => var_expr x.
+  Definition subst0 : subst := fun x => stack_get x.
 
   (* Substitution of one variable *)
   Definition subst1 e x : subst :=
-    fun x' => if x' ?[ eq ] x then e else var_expr x'.
+    fun x' => if x' ?[ eq ] x then e else stack_get x'.
 
   (* Truncating substitution of one variable *)
   Definition subst1_trunc e x : subst :=
@@ -119,13 +119,13 @@ Section Properties.
       consider (z ?[ eq ] x); intros; subst.
       * rewrite stack_lookup_add; reflexivity.
       * rewrite stack_lookup_add2; [reflexivity| intuition congruence].
-    + unfold var_expr.
+    + unfold stack_get.
       rewrite stack_lookup_add2; [reflexivity | intuition].
   Qed.
       
-  Lemma stack_add_var (x : A) (s : @stack A val) (v : val) : (var_expr x) (stack_add x v s) = v.
+  Lemma stack_add_var (x : A) (s : @stack A val) (v : val) : (stack_get x) (stack_add x v s) = v.
   Proof.
-    unfold var_expr. rewrite stack_lookup_add. reflexivity.
+    unfold stack_get. rewrite stack_lookup_add. reflexivity.
   Qed.
   
   Lemma subst1_val (v : val) (e : open val) (x : A) :
@@ -157,7 +157,7 @@ Section Properties.
   Qed.
 
   Lemma subst1_trunc_singleton_stack {B} (p : open B) (s : @stack A val) x y :
-    p[{(var_expr y) //! x}] s = p (stack_add x (s y) (stack_empty A val)).
+    p[{(stack_get y) //! x}] s = p (stack_add x (s y) (stack_empty A val)).
   Proof.
     unfold apply_subst, subst1_trunc, stack_subst; simpl.
     apply f_equal.
@@ -195,21 +195,21 @@ Section MoreLemmas.
   Qed.
 
   Lemma subst_var_cons_eq : 
-    forall (x:A) es (e : expr (val := val)), (var_expr x // (cons (x, e) es)) = e.
+    forall (x:A) es (e : expr (val := val)), (stack_get x // (cons (x, e) es)) = e.
   Proof.
     intros x es e.
     apply functional_extensionality; intros s; simpl.
-    unfold var_expr, apply_subst, stack_subst. simpl.
+    unfold stack_get, apply_subst, stack_subst. simpl.
     consider (x ?[ eq ] x); intuition congruence.
   Qed.
 
   Lemma subst_var_cons_ineq : forall (x:A) y es (e : expr (val := val))
     (Hneq: x <> y),
-    (var_expr x // (cons (y, e) es)) = (var_expr x // es).
+    (stack_get x // (cons (y, e) es)) = (stack_get x // es).
   Proof.
     intros x y es e Hneq.
     apply functional_extensionality; intros s.
-    unfold var_expr, apply_subst, stack_subst; simpl.
+    unfold stack_get, apply_subst, stack_subst; simpl.
     consider (x ?[ eq ] y); congruence.
   Qed.
 
@@ -247,7 +247,7 @@ Section SubstFresh.
   Context {R : ValNull val}.
       
    Definition subst_fresh (vs: A -> val) (xs: list A) : subst :=
-      fun x' => if (List.anyb (rel_dec x')) xs then V_expr (vs x') else var_expr x'.
+      fun x' => if (List.anyb (rel_dec x')) xs then V_expr (vs x') else stack_get x'.
 
    Fixpoint subst_fresh_l (vs: A -> val) (xs: list A) : list (@expr A val) :=
       match xs with
