@@ -18,12 +18,12 @@ Section SepAlgSect.
     sa_unit_ex a       : exists e, sa_unit e /\ sa_mul a e a;
     sa_unit_eq a a' e  : sa_unit e -> sa_mul a e a' -> rel a' a;
     sa_unit_proper     : Proper (rel ==> iff) sa_unit;
-    sa_mul_mon a b c d : rel a b -> sa_mul a c d -> sa_mul b c d 
+    sa_mul_mon a b c d : rel a b -> sa_mul a c d -> sa_mul b c d
   }.
 
 End SepAlgSect.
 
-Implicit Arguments SepAlg [[rel] [SAOps]].
+Arguments SepAlg {T} {rel} {SAOps} : rename.
 
 Section SepAlgCompat.
   Context A `{SA: SepAlg A}.
@@ -62,11 +62,11 @@ Section SepAlgCompat.
 End SepAlgCompat.
 
 Module SepAlgNotations.
-Notation "a '-' b" := (sa_mul a b) (at level 50, left associativity) : sa_scope.
-Notation "a '-' b |-> c" := (sa_mul a b c) (at level 52, no associativity) : sa_scope.
-Notation "^" := sa_unit : sa_scope.
-Notation "a # b" := (compat a b) (at level 70, no associativity) : sa_scope.
-Notation "a <= b" := (subheap a b) (at level 70, no associativity) : sa_scope.
+  Notation "a '-' b" := (sa_mul a b) (at level 50, left associativity) : sa_scope.
+  Notation "a '-' b |-> c" := (sa_mul a b c) (at level 52, no associativity) : sa_scope.
+  Notation "^" := sa_unit : sa_scope.
+  Notation "a # b" := (compat a b) (at level 70, no associativity) : sa_scope.
+  Notation "a <= b" := (subheap a b) (at level 70, no associativity) : sa_scope.
 End SepAlgNotations.
 
 Import SepAlgNotations.
@@ -74,7 +74,7 @@ Import SepAlgNotations.
 Delimit Scope sa_scope with sa.
 
 Instance subheap_preo A `{sa : SepAlg A} : PreOrder (@subheap A SAOps).
-Proof. 
+Proof.
   split.
   + intros a. pose proof (sa_unit_ex a) as [u [H1 H2]].
     unfold subheap. exists u. apply H2.
@@ -114,14 +114,14 @@ Qed.
 Section Properties.
   Context A `{sa : SepAlg A}.
   Open Scope sa_scope.
-   
+
   Global Instance sa_subheap_equiv_proper :
     Proper (rel ==> rel ==> iff) (subheap (A := A)).
   Proof.
     intros x y Heqxy t u Heqtu; split; intros [c H]; exists c;
     [rewrite <- Heqxy; rewrite <- Heqtu | rewrite  Heqxy; rewrite Heqtu]; assumption.
   Qed.
-  
+
   Global Instance sa_subheap_subheap_proper :
      Proper (subheap --> subheap ++> impl) (subheap (A := A)).
   Proof.
@@ -130,7 +130,7 @@ Section Properties.
 	destruct (sa_mulA Hydt Hubt) as [f [_ Hyfu]].
 	exists f. apply Hyfu.
   Qed.
-	  
+
   Global Instance sa_compat_equiv_proper :
     Proper (rel ==> rel ==> iff) (compat (A := A)).
   Proof.
@@ -160,6 +160,7 @@ Section Properties.
 
 End Properties.
 
-Implicit Arguments subheap [[A] [SAOps]].
-Implicit Arguments subheapT [[A] [rel] [SAOps] [b]].
-Implicit Arguments compat_subheap [[A] [rel] [sa] [r] [t] [SAOps]].
+Arguments SepAlg _ {rel SAOps} : rename.
+Arguments subheap {A} {SAOps}.
+Arguments subheapT {A rel SAOps SA} [_ _ _] : rename.
+Arguments compat_subheap {A rel SAOps SA} [_ _ _] _ _ : rename.

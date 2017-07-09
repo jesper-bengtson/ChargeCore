@@ -141,18 +141,17 @@ Section BISepAlg2.
   Context {A} `{sa : SepAlg A}.
   Context {B} `{BIL: BILogic B}.
   Context {HPre : PreOrder rel}.
-  Context {HIL : ILogic B
-  }.
+  Context {HIL : ILogic B}.
 
   Open Scope sa_scope.
 
   Local Transparent ILPre_Ops.
 
-  Global Program Instance SABIOps2: BILogicOps (ILPreFrm rel B) := {
-    empSP := mkILPreFrm (fun x => Exists a : (sa_unit x), empSP) _;
-    sepSP P Q :=  mkILPreFrm (fun x => Exists x1, Exists x2, Exists H : sa_mul x1 x2 x,
-                                                (ILPreFrm_pred P) x1 ** (ILPreFrm_pred Q) x2) _;
-    wandSP P Q := mkILPreFrm (fun x => Forall x1, Forall x2, Forall H : sa_mul x x1 x2,
+  Global Program Instance SABIOps2: BILogicOps (ILPreFrm rel B) :=
+  { empSP := mkILPreFrm (fun x => Exists a : (sa_unit x), empSP) _
+  ; sepSP P Q :=  mkILPreFrm (fun x => Exists x1, Exists x2, Exists H : sa_mul x1 x2 x,
+                                                (ILPreFrm_pred P) x1 ** (ILPreFrm_pred Q) x2) _
+  ; wandSP P Q := mkILPreFrm (fun x => Forall x1, Forall x2, Forall H : sa_mul x x1 x2,
                                                  (ILPreFrm_pred P) x1 -* (ILPreFrm_pred Q) x2) _
   }.
   Next Obligation.
@@ -213,7 +212,7 @@ Section BISepAlg2.
   Context {POB : @PureOp B}.
   Context {PureB : Pure POB}.
 
-  Global Instance pureop_bi_sepalg2 : PureOp _ := {
+  Global Instance pureop_bi_sepalg2 : PureOp (ILPreFrm rel B) := {
     pure := fun (P : ILPreFrm rel B) =>
         (forall h, pure ((ILPreFrm_pred P) h)) /\
     	(forall h h', (ILPreFrm_pred P) h |-- (ILPreFrm_pred P) h')

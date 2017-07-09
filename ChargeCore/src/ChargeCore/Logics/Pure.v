@@ -157,5 +157,5 @@ Section Pure.
 
 End Pure.
 
-Arguments Pure {A ILOPs BILOps} HP : clear implicits, rename.
-Arguments PureOp _ : clear implicits, rename.
+Arguments Pure {A ILOPs BILOps} HP : rename.
+Arguments PureOp _ : rename, clear implicits.

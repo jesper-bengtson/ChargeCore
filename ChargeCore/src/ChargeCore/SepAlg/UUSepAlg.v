@@ -26,4 +26,4 @@ Section SepAlgUniqueUnit.
 
 End SepAlgUniqueUnit.
 
-Implicit Arguments UUSepAlg [[rel] [SAOps]].
+Arguments UUSepAlg _ {rel SAOps} : rename.

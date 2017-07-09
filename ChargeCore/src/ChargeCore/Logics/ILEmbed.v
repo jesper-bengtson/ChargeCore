@@ -21,7 +21,7 @@ Section ILogicEmbed.
 End ILogicEmbed.
 
 Arguments EmbedOp _ _ : clear implicits.
-Arguments Embed _ {ILOpsA} _ {ILOpsB EmbOp} : rename, clear implicits.
+Arguments Embed _ {ILOpsA} _ {ILOpsB EmbOp} : rename.
 
 Section ILogicEmbedOps.
   Context {A B} `{HAB: Embed A B} {ILA: ILogic A} {ILB: ILogic B}.
@@ -34,13 +34,13 @@ End ILogicEmbedOps.
 
 Section ILEmbedId.
 
-	Context {A : Type} `{ILA : ILogic A}.
+  Context {A : Type} `{ILA : ILogic A}.
 
-	Instance EmbedOpId : EmbedOp A A := { embed := id }.
-	Global Instance EmbedId : Embed A A.
-	Proof.
-		split; firstorder.
-	Qed.
+  Instance EmbedOpId : EmbedOp A A := { embed := id }.
+  Global Instance EmbedId : Embed A A.
+  Proof.
+    split; firstorder.
+  Qed.
 
 End ILEmbedId.
 
