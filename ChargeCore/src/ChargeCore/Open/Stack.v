@@ -66,8 +66,8 @@ Section Defs.
 
 End Defs.
 
-Implicit Arguments stack [].
-Implicit Arguments stack_empty [[VNB]].
+Arguments stack _ _ : clear implicits, assert.
+Arguments stack_empty A val {_}.
 
 Hint Rewrite @stack_lookup_add
              @stack_add_same
