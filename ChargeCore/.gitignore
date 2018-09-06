@@ -6,5 +6,7 @@ _CoqPath
 *.aux
 *~
 Makefile.coq
+Makefile.coq.conf
 /bin
 .coq-native
+.coqdeps.d
