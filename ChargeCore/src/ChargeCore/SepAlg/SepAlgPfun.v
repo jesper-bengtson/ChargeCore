@@ -1,6 +1,5 @@
 Require Import Setoid Morphisms Coq.Strings.String Coq.Lists.List.
 From ChargeCore.SepAlg Require Import SepAlg UUSepAlg.
-(* Require Import Program.Basics Program.Tactics Program.Syntax.*)
 
 Require Import ExtLib.Core.RelDec.
 Require Import ExtLib.Tactics.Consider.

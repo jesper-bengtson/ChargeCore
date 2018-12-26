@@ -121,65 +121,7 @@ Section IBISepAlg.
     + apply _.
     + simpl; intros _. apply ltrueR.
   Qed.
-(*
-  Local Existing Instance SAIBILogic.
 
-  Require Import ILEmbed.
-  Context {EO: EmbedOp Prop B} {Emb: Embed Prop B}.
-
-
-  Definition supported (P : ILPreFrm subheap B) : B :=
-  	Forall h, Forall h', P h //\\ P h' -->> Exists h'', embed (subheap h'' h) //\\ embed (subheap h'' h') //\\ P h''.
-
-
-  Lemma supported_axiom (P : ILPreFrm subheap B) : supported P -|- Forall h, (Forall Q, Forall R, (P ** Q) //\\ (P ** R) -->> P ** ((Q ** ltrue) //\\ (R ** ltrue))) h.
-  Proof.
-    split.
-    + apply lforallR; intro h. apply lforallR; intro Q. apply lforallR; intro R.
-      assert ((((P ** Q) //\\ P ** R -->> P ** (Q ** ltrue) //\\ R ** ltrue) h) -|-
-              ((((P ** Q) //\\ P ** R) h) -->> ((P ** (Q ** ltrue) //\\ R ** ltrue) h))) by admit.
-      rewrite H.
-      apply limplAdj.
-      simpl. rewrite landC.
-      apply landAdj.
-      rewrite landexistsDL. apply lexistsL; intros h'.
-	  rewrite landexistsDL; apply lexistsL; intros h''.
-	  rewrite landexistsDL; apply lexistsL; intros Hsub1.
-  	  rewrite landC.
-	  rewrite landexistsDL; apply lexistsL; intros h'''.
-	  rewrite landexistsDL; apply lexistsL; intros h''''.
-      rewrite landexistsDL; apply lexistsL; intros Hsub2.
-      apply limplAdj.
-      unfold supported.
-      rewrite landC.
-      rewrite landforallDL; apply lforallL with h'.
-      rewrite landforallDL; apply lforallL with h'''.
-      apply limplL. apply landR. apply landL2. apply landL1. reflexivity.
-      apply landL1. apply landL1. reflexivity.
-      rewrite landexistsDL. apply lexistsL. intro h'''''.
-      repeat rewrite landA.
-      apply lpropandL. intros Hsub3.
-      apply lpropandL. intros Hsub4.
-      destruct Hsub3 as [h'''''' Hsub3].
-      destruct Hsub4 as [h''''''' Hsub4].
-      apply lexistsR with h'''''.
-      destruct (sa_mulA Hsub3 Hsub1) as [x [Hsub5 Hsub6]].
-      destruct (sa_mulA Hsub4 Hsub2) as [y [Hsub7 Hsub8]].
-      Check (@sa_mul_proper _ e).
-Require Import Setoid Morphisms RelationClasses OrderedType.
-      assert (x === y) as Hxy by admit.
-      apply lexistsR with x. apply lexistsR with Hsub6.
-      repeat apply landR.
-      * apply landL1. reflexivity.
-      * apply lexistsR with h''. apply lexistsR with h''''''.
-        apply lexistsR. apply sa_mulC. apply Hsub5.
-        apply landR; [|apply ltrueR]. repeat apply landL2. reflexivity.
-      * apply lexistsR with h''''. apply lexistsR with h'''''''.
-        apply lexistsR. apply sa_mulC. rewrite Hxy. apply Hsub7.
-        apply landR; [|apply ltrueR]. apply landL2. apply landL2. apply landL1. reflexivity.
-    + unfold supported. apply lforallR; intro h. apply lforallR; intro h'.
-
-*)
   Instance pureop_pure_ibi_sepalg : PureOp _ := {
     pure := fun (P : ILPreFrm subheap B) => forall h h', (ILPreFrm_pred P) h |-- (ILPreFrm_pred P) h'
   }.

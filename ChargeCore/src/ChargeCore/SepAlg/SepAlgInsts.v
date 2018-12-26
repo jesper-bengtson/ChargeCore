@@ -97,7 +97,7 @@ Section UUSAProd.
   Qed.
 
 End UUSAProd.
-(*
+
 Section SASum.
   Context A B `{HA: SepAlg A} `{HB: SepAlg B}.
 
@@ -115,123 +115,48 @@ Section SASum.
       end
    |}.
 
-  Global Instance SepAlg_sum: SepAlg (A + B).
+  Variant sum_eq : A + B -> A + B -> Prop :=
+  | sum_eq_L {a a'} (_ : rel a a')
+    : sum_eq (inl a) (inl a')
+  | sum_eq_R {b b'} (_ : rel0 b b')
+    : sum_eq (inr b) (inr b').
+
+  Global Instance SepAlg_sum: @SepAlg _ sum_eq _.
   Proof.
-    esplit.
-    - intros [] [] []; simpl; auto; intros; apply sa_mulC; assumption.
-    - intros [] [] [] [] []; simpl; intros ? Habc Hbc; try tauto.
-      + destruct (sa_mulA Habc Hbc) as [exA []].
-        exists (inl exA). split; assumption.
-      + destruct (sa_mulA Habc Hbc) as [exB []].
-        exists (inr exB). split; assumption.
-    - intros [a|b].
-      + destruct (sa_unit_ex a) as [ea [Hea Hmulea]].
-        exists (inl ea). split; assumption.
-      + destruct (sa_unit_ex b) as [eb [Heb Hmuleb]].
-        exists (inr eb). split; assumption.
-    - intros [] [] []; simpl; try tauto;
-        intros; unfold rel, Rel_sum; eapply sa_unit_eq; eassumption.
-    - intros [] []; simpl; unfold rel, Equivalence.equiv, Rel_sum; intros ? H;
-        now try rewrite H.
-    - intros [] [] [] [] Heq Hab; unfold Equivalence.equiv, rel in *; simpl in *;
-      now try rewrite <- Heq.
+    econstructor.
+    { constructor.
+      { compute. destruct x; constructor; reflexivity. }
+      { compute. inversion 1; constructor; subst; symmetry; eauto. }
+      { compute. inversion 1; subst; inversion 1; subst; constructor; subst; etransitivity; eauto. } }
+    { destruct a; simpl; try destruct b; try destruct c; simpl; eauto.
+      eapply sa_mulC.
+      destruct b0; auto.
+      eapply sa_mulC. }
+    { intros [] [] [] [] [];  simpl;
+          try solve [ eauto | intros ; contradiction ].
+      { intros H H'. destruct (@sa_mulA _ _ _ _ _ _ _ _ _ H H').
+        exists (inl x); eauto. }
+      { intros H H'. destruct (@sa_mulA _ _ _ _ _ _ _ _ _ H H').
+        exists (inr x); eauto. } }
+    { intros [].
+      { destruct (sa_unit_ex a). 
+        exists (inl x). auto. }
+      { destruct (sa_unit_ex b). 
+        exists (inr x). auto. } }
+    { intros [] [] []; simpl; intros; try contradiction; constructor.
+      eapply sa_unit_eq; eauto.
+      eapply sa_unit_eq; eauto. }
+    { constructor.
+      { inversion H; subst; simpl; eauto using sa_unit_proper.
+        eapply sa_unit_proper; symmetry; eauto.
+        eapply sa_unit_proper; symmetry; eauto. }
+      { inversion H; subst; simpl; eauto using sa_unit_proper.
+        eapply sa_unit_proper; eauto.
+        eapply sa_unit_proper; eauto. } }
+    { inversion 1; subst; simpl; eauto.
+      { destruct c; destruct d; eauto.
+        eapply sa_mul_mon; eauto. }
+      { destruct c; destruct d; eauto.
+        eapply sa_mul_mon; eauto. } }
   Qed.
 End SASum.
-*)
-Require Import Coq.Lists.List.
-Require Import Coq.Classes.Morphisms.
-
-Module SAFin.
-Section SAFin.
-  Context (T: Type). (* TODO: Equiv T *)
-  Context A `{HA: SepAlg A}.
-
-  (* A function where only a finite number of elements map to non-unit. *)
-  Record finfun :=
-  { ff_fun :> T -> A
-  ; ff_fin: exists l, forall t, ~ In t l -> sa_unit (ff_fun t)
-  }.
-
-  Definition rel_finfun : relation finfun :=
-    fun f f' => forall t, rel (f t) (f' t).
-
-  Global Instance Equivalence_finfun: Equivalence rel_finfun.
-  Proof.
-    split.
-    - intros f t. reflexivity.
-    - intros f f' H t. symmetry. apply H.
-    - intros f1 f2 f3 H12 H23 t.
-      etransitivity; [apply H12 | apply H23].
-  Qed.
-
-  Global Instance SepRelOps_fin: SepAlgOps finfun := {
-    sa_unit f := forall t, sa_unit (f t);
-    sa_mul f1 f2 f := forall t, sa_mul (f1 t) (f2 t) (f t)
-  }.
-
-  (* This is a sound axiom to add to Coq, and it's even provable for
-     countable A, but it papers over some constructivity issues in
-     these definitions. Instead of adding this axiom, we should either
-     - Make ff_fun non-constructive; i.e., make it a functional relation.
-     - Require that the sr_mulA and sr_unit_ex witnesses for A use sig instead
-       of ex.
-   *)
-  Hypothesis indefinite_description : forall (P : A->Prop),
-   ex P -> sig P.
-
-  Global Instance SepAlg_fin: SepAlg (rel := rel_finfun) finfun.
-  Proof.
-    admit.
-    (*
-    - intros a b c H t. specialize (H t). now apply sa_mulC in H.
-    - intros a b c ab abc Hab Habc.
-      set (f := (fun t => proj1_sig (indefinite_description (
-                                         sa_mulA (Hab t) (Habc t))))).
-      refine (ex_intro _ (@Build_finfun f _) _).
-      esplit; intros t; simpl; unfold f; clear f.
-      + set (rec := (sa_mulA (Hab t) (Habc t))).
-        destruct (indefinite_description rec) as [a' [Hbc Htmp]].
-        intros H. simpl. admit.
-      + set (rec := (sa_mulA (Hab t) (Habc t))).
-        destruct (indefinite_description rec) as [a' [Htmp Habc']].
-        simpl. assumption.
-    - intros f.
-      set (e0 := (fun t => proj1_sig (indefinite_description (
-                                         sa_unit_ex (f t))))).
-      refine (ex_intro _ (@Build_finfun e0 _) _).
-      split; intros t; simpl; unfold e0; clear e0.
-      + set (rec := sa_unit_ex (f t)).
-        destruct (indefinite_description rec) as [eA [Hunit Hmul]].
-        simpl. assumption.
-      + set (rec := sa_unit_ex (f t)).
-        destruct (indefinite_description rec) as [eA [Hunit Hmul]].
-        simpl. assumption.
-    - intros a a' e0 Hunit Hmul. intros t.
-      eapply sa_unit_eq; [apply Hunit | apply Hmul].
-    - intros f f' Hf. split; intros H t.
-      + rewrite <-(Hf t). apply H.
-      + rewrite (Hf t). apply H.
-    - intros f f' g g' Hf Hg t.
-      + rewrite <-(Hf t). apply Hg.
-  Grab Existential Variables.
-  * exists nil. intros t _.
-    unfold e0; clear e0.
-    set (rec := sa_unit_ex (f t)).
-    destruct (indefinite_description rec) as [e0 [Hunit Hmul]].
-    assumption.
-  * destruct (ff_fin b) as [lb Hlb].
-    destruct (ff_fin c) as [lc Hlc].
-    exists (lb ++ lc). intros t Hnotin.
-    assert (Hnotin_b: ~ In t lb).
-    { intros Hin. apply Hnotin. apply in_or_app. now left. }
-    assert (Hnotin_c: ~ In t lc).
-    { intros Hin. apply Hnotin. apply in_or_app. now right. }
-    specialize (Hlb _ Hnotin_b). clear Hnotin_b Hnotin.
-    specialize (Hlc _ Hnotin_c). clear Hnotin_c. unfold f; clear f.
-    set (rec := (sa_mulA (Hab t) (Habc t))).
-    destruct (indefinite_description rec) as [a' [Hbc Habc']].
-    simpl. now rewrite (sa_unit_eq Hlc Hbc).
-*)
-  Admitted.
-End SAFin.
-End SAFin.
