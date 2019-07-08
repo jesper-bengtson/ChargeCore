@@ -53,14 +53,11 @@ Infix "|--"  := lentails (at level 80, no associativity).
 Infix "//\\"   := land (at level 75, right associativity).
 Infix "\\//"   := lor (at level 76, right associativity).
 Infix "-->>"   := limpl (at level 77, right associativity).
-Notation "'Forall' x : T , p" :=
-  (lforall (fun x : T => p)) (at level 78, x ident, right associativity).
-Notation "'Forall' x , p" :=
-  (lforall (fun x => p)) (at level 78, x ident, right associativity, only parsing).
-Notation "'Exists' x : T , p" :=
-  (lexists (fun x : T => p)) (at level 78, x ident, right associativity).
-Notation "'Exists' x , p" :=
-  (lexists (fun x => p)) (at level 78, x ident, right associativity, only parsing).
+Notation "'Forall' x .. y , p" :=
+  (lforall (fun x => .. (lforall (fun y => p)) ..)) (at level 78, x binder, y binder, right associativity).
+Notation "'Exists' x .. y , p" :=
+  (lexists (fun x => .. (lexists (fun y => p)) ..)) (at level 78, x binder, y binder, right associativity).
+
 
 Section ILogicEquiv.
   Context {A : Type} `{IL: ILogicOps A}.
@@ -296,7 +293,7 @@ Section ILogicFacts.
           end
         end
     end.
-    
+
   Lemma lentails_refl P : P |-- P.
   Proof. reflexivity. Qed.
 
@@ -365,7 +362,7 @@ Section ILogicFacts.
     rewrite landC, landexistsDL1.
     setoid_rewrite landC at 1; reflexivity.
   Qed.
-  
+
   Lemma landexistsDR1 (f : T -> A) (P : A) :
      Exists a, (f a //\\ P) |-- lexists f //\\ P.
   Proof.
@@ -380,7 +377,7 @@ Section ILogicFacts.
     rewrite landC, <- landexistsDR1.
     setoid_rewrite landC at 1; reflexivity.
   Qed.
-  
+
   Lemma landexistsD1 (f : T -> A) (P : A) :
     (Exists a, f a) //\\ P -|- Exists a, (f a //\\ P).
   Proof.
